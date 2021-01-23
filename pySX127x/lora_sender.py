@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
 
-""" A simple continuous receiver class. """
+""" This program sends a packet and waits for a response. """
 
-# Copyright 2015 Mayer Analytics Ltd.
+# Copyright 2018 Rui Silva.
 #
-# This file is part of pySX127x.
+# This file is part of rpsreal/pySX127x, fork of mayeranalytics/pySX127x.
 #
 # pySX127x is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public
 # License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later
@@ -41,13 +41,22 @@ class LoRaRcvCont(LoRa):
     def on_rx_done(self):
         BOARD.led_on()
         print("\nRxDone")
+        print("Recebeu a resposta:")
         self.clear_irq_flags(RxDone=1)
         payload = self.read_payload(nocheck=True)
         print(bytes(payload).decode("utf-8",'ignore'))
         self.set_mode(MODE.SLEEP)
+        sleep(5)
+        print("Send again")
+        self.set_mode(MODE.TX)
+        self.clear_irq_flags(TxDone=1)
+        sys.stdout.flush()
+        self.tx_counter += 1
+        sys.stdout.write("\rtx #%d" % self.tx_counter)
+        self.write_payload([255, 255, 0, 0, 104, 101, 108, 108, 111])
         self.reset_ptr_rx()
-        BOARD.led_off()
         self.set_mode(MODE.RXCONT)
+        BOARD.led_off()
 
     def on_tx_done(self):
         print("\nTxDone")
@@ -74,6 +83,9 @@ class LoRaRcvCont(LoRa):
         print(self.get_irq_flags())
 
     def start(self):
+        sys.stdout.write("\rstart")
+        self.tx_counter = 0
+        self.write_payload([255, 255, 0, 0, 104, 101, 108, 108, 111])
         self.reset_ptr_rx()
         self.set_mode(MODE.RXCONT)
         while True:
@@ -85,34 +97,23 @@ class LoRaRcvCont(LoRa):
 
 
 lora = LoRaRcvCont(verbose=False)
-args = parser.parse_args(lora)
+args = parser.parse_args(lora) # configs in LoRaArgumentParser.py
 
 lora.set_mode(MODE.STDBY)
 lora.set_pa_config(pa_select=1)
-#lora.set_rx_crc(True)
-#lora.set_coding_rate(CODING_RATE.CR4_6)
-#lora.set_pa_config(max_power=0, output_power=0)
-#lora.set_lna_gain(GAIN.G1)
-#lora.set_implicit_header_mode(False)
-#lora.set_low_data_rate_optim(True)
-#lora.set_pa_ramp(PA_RAMP.RAMP_50_us)
-#lora.set_agc_auto_on(True)
 
-print(lora)
+
 assert(lora.get_agc_auto_on() == 1)
 
-try: input("Press enter to start...")
-except: pass
-
 try:
+    print("START")
     lora.start()
 except KeyboardInterrupt:
     sys.stdout.flush()
-    print("")
+    print("Exit")
     sys.stderr.write("KeyboardInterrupt\n")
 finally:
     sys.stdout.flush()
-    print("")
+    print("Exit")
     lora.set_mode(MODE.SLEEP)
-    print(lora)
     BOARD.teardown()

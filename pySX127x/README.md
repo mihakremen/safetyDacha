@@ -1,3 +1,102 @@
+# This fork - pyLoRa
+This fork is an adaptation and an improved version of the original mayeranalytic work (mayeranalytics/pySX127x)
+pyLoRa can be used to communicate with the Arduino through the RADIOHEAD library, for more information see these examples -> [rpsreal/LoRa_Ra-02_Arduino](https://github.com/rpsreal/LoRa_Ra-02_Arduino). 
+
+**Update 05/2018 - Added encrypted versions** 
+For security reasons it is advisable to use the encrypted versions that use [Advanced Encryption Standard](https://en.wikipedia.org/wiki/Advanced_Encryption_Standard) (AES). You can also use them to communicate with the Arduino.
+
+
+**Update 08/2018 - Added support for 2 modules at the same time** Now it is possible to use 2 radio modules at the same time in Raspberry Pi. To do this, simply use the BOARD2 settings like this:
+```python
+# Use BOARD 2 (you can use BOARD1 and BOARD2 at the same time just give another name)
+from SX127x.LoRa import LoRa2 as LoRa
+from SX127x.board_config import BOARD2 as BOARD
+```
+
+**Update 04/2019 - Clarification on the use of different communication frequencies** It is possible to use several different communication frequencies using pyLora. The default frequency is 868MHz (Europe), but you can change the communication frequency to use Ai-Thinker Ra-02 Modules (433MHz) for example. To do this, look for the "868" in the SX127x/LoRa.py file and replace them with the desired frequency.
+
+
+It supports Python 3 or newer and PyPi. https://pypi.org/project/pyLoRa/
+
+## Easy setup on Raspberry Pi:
+```bash
+sudo raspi-config nonint do_spi 0
+sudo apt-get install python-dev python3-dev
+```
+
+### Installation:
+For **Install with pip** perform the following installation steps:
+```bash
+sudo apt-get install python-pip python3-pip
+pip install RPi.GPIO
+pip install spidev
+pip install pyLoRa
+```
+
+For **encrypted versions only** it is necessary to perform the following installation step:
+```bash
+pip install pycryptodome
+pip install pycrypto
+```
+
+
+### Hardware
+Make the connections as shown below.
+If it is necessary to change edit the file board_config.py
+
+| Ra-02 LoRa BOARD1 |  RaspPi GPIO  | Ra-02 LoRa BOARD2 |  RaspPi GPIO  |
+|:------------------|:--------------|:------------------|:-------------:|
+|        MOSI       | GPIO 10       |        MOSI       | GPIO 10       |
+|        MISO       | GPIO 9        |        MISO       | GPIO 9        |
+|     SCK (SCLK)    | GPIO 11       |     SCK (SCLK)    | GPIO 11       |
+|        NSS        | GPIO 8 (CE0)  |        NSS        | GPIO 7 (CE1)  |
+|     DIO0 (IRQ)    | GPIO 4        |     DIO0 (IRQ)    | GPIO 23       |
+|        DIO1       | GPIO 17       |        DIO1       | GPIO 24       |
+|        DIO2       | GPIO 18       |        DIO2       | GPIO 25       |
+|        DIO3       | GPIO 27       |        DIO3       | GPIO 5        |
+|     RST (Reset)   | GPIO 22       |     RST (Reset)   | GPIO 6        |
+|        LED        | GPIO 13       |        LED        | GPIO 19       |
+
+LED external with 1k ohm or 330ohm (optional)
+
+### How to Use
+View the sample files. 
+If you downloaded the library and sample files, now you can start LORA_SERVER or LORA_CLIENT (encrypted or non-encripted).
+To work, there must be another LORA_SERVER or LORA_CLIENT running on another device (Raspberry Pi or Arduino)
+
+For example, if you are running on an [Arduino the LORA_CLIENT](https://github.com/rpsreal/LoRa_Ra-02_Arduino/blob/master/LORA_CLIENT.ino) then start the [LORA_SERVER.py on Raspberry Pi](https://github.com/rpsreal/pySX127x/blob/master/LORA_SERVER.py) like this:
+```bash
+cd pySX127x
+python3 ./LORA_SERVER.py
+```
+
+### Extra 
+If you do not need to install the library you can use it simply in the same directory.
+To **Download library and example files**:
+```bash
+sudo apt-get install python-rpi.gpio python3-rpi.gpio
+sudo apt-get install python-spidev python3-spidev
+sudo apt-get install git
+sudo git clone https://github.com/rpsreal/pySX127x
+```
+
+If it is necessary to run the library from anywhere:
+```bash
+nano ~/.bashrc
+```
+Put this at the end of the file: 
+> export PYTHONPATH=/home/pi/pySX127x/
+
+And then:
+```bash
+source ~/.bashrc
+```
+
+Developed by Rui Silva, Porto, Portugal
+
+
+
+# Forked from mayeranalytics/pySX127x
 # Overview
 
 This is a python interface to the [Semtech SX1276/7/8/9](http://www.semtech.com/wireless-rf/rf-transceivers/) 
@@ -23,10 +122,10 @@ Arduino and there are already many fine C/C++ libraries for the SX127x family av
 [github](https://github.com/search?q=sx127x) and [mbed.org](https://developer.mbed.org/search/?q=sx127x).
 
 Although C/C++ is the de facto standard for development on microcontrollers, [python](https://www.python.org)
-running on a Raspberry Pi (NanoPi, BananaPi, UDOO Neo, BeagleBoard, etc. etc.) is becoming a viable alternative for rapid prototyping.
+running on a Raspberry Pi is becoming a viable alternative for rapid prototyping.
 
 High level programming languages like python require a full-blown OS such as Linux. (There are some exceptions like
-[MicroPython](https://micropython.org) and its fork [CircuitPython](https://www.adafruit.com/circuitpython).)
+[PyMite](https://wiki.python.org/moin/PyMite) and most notably [MicroPython](https://micropython.org).)
 But using hardware capable of running Linux contradicts, to some extent, the low power specification of the SX127x family.
 Therefore it is clear that this approach aims mostly at prototyping and technology testing.
 
@@ -76,7 +175,7 @@ lora.set_mode(MODE.STDBY)
 ```
 Registers are queried like so:
 ```python
-print lora.version()        # this prints the sx127x chip version
+print lora.get_version()        # this prints the sx127x chip version
 print lora.get_freq()       # this prints the frequency setting 
 ```
 and setting registers is easy, too
@@ -267,9 +366,7 @@ Likewise Microchip has the chip [RN2483](http://ww1.microchip.com/downloads/en/D
 The [pySX127x](https://github.com/mayeranalytics/pySX127x) project will therefore be renamed to pyLoRa at some point.
 
 # LoRaWAN
-LoRaWAN is a LPWAN (low power WAN) and, and  **pySX127x** has almost no relationship with LoRaWAN. Here we only deal with the interface into the chip(s) that enable the physical layer of LoRaWAN networks. If you need a LoRaWAN implementation have a look at [Jeroennijhof](https://github.com/jeroennijhof)s [LoRaWAN](https://github.com/jeroennijhof/LoRaWAN) which is based on pySX127x.
-
-By the way, LoRaWAN is what you need when you want to talk to the [TheThingsNetwork](https://www.thethingsnetwork.org/), a "global open LoRaWAN network". The site has a lot of information and links to products and projects.
+LoRaWAN is a LPWAN (low power WAN) and, and  **pySX127x** has almost no relationship with LoRaWAN. Here we only deal with the interface into the chip(s) that enable the physical layer of LoRaWAN networks.
 
 
 # References
@@ -314,6 +411,3 @@ pySX127x without disclosing the source code of your own applications, or shippin
 
 You should have received a copy of the GNU General Public License
 along with pySX127.  If not, see <http://www.gnu.org/licenses/>.
-
-# Other legal boredom
-LoRa, LoRaWAN, LoRa Alliance are all trademarks by ... someone.

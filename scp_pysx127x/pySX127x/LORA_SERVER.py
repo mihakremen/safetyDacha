@@ -1,3 +1,10 @@
+#!/usr/bin/env python3
+
+""" This program asks a client for data and waits for the response, then sends an ACK. """
+
+# Copyright 2018 Rui Silva.
+#
+# This file is part of rpsreal/pySX127x, fork of mayeranalytics/pySX127x.
 #
 # pySX127x is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public
 # License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later
@@ -40,8 +47,8 @@ class mylora(LoRa):
         print(bytes(payload).decode("utf-8",'ignore')) # Receive DATA
         BOARD.led_off()
         time.sleep(1) # Wait for the client be ready
-        print ("Send: ACK")
-        self.write_payload([255, 255, 0, 0, 65, 67, 75, 0]) # Send ACK
+#        print ("Send: ACK")
+#        self.write_payload([255, 255, 0, 0, 65, 67, 75, 0]) # Send ACK
         self.set_mode(MODE.TX)
         self.var=1
 
@@ -69,27 +76,27 @@ class mylora(LoRa):
         print("\non_FhssChangeChannel")
         print(self.get_irq_flags())
 
-    def start(self):
+    def start(self):          
         while True:
-            while (self.var == 0):
-                print("Send: INF")
-                self.write_payload([255, 255, 0, 0, 73, 78, 70, 0])  # Send INF
+            while (self.var==0):
+                print ("Send: INF")
+                self.write_payload([255, 255, 0, 0, 73, 78, 70, 0]) # Send INF
                 self.set_mode(MODE.TX)
-                time.sleep(3)  # there must be a better solution but sleep() works
+                time.sleep(3) # there must be a better solution but sleep() works
                 self.reset_ptr_rx()
-                self.set_mode(MODE.RXCONT)  # Receiver mode
-
+                self.set_mode(MODE.RXCONT) # Receiver mode
+            
                 start_time = time.time()
-                while (time.time() - start_time < 10):  # wait until receive data or 10s
+                while (time.time() - start_time < 10): # wait until receive data or 10s
                     pass;
-
-                self.var = 0
-                self.reset_ptr_rx()
-                self.set_mode(MODE.RXCONT)  # Receiver mode
-                time.sleep(10)
+            
+            self.var=0
+            self.reset_ptr_rx()
+            self.set_mode(MODE.RXCONT) # Receiver mode
+            time.sleep(10)
 
 lora = mylora(verbose=False)
-# args = parser.parse_args(lora) # configs in LoRaArgumentParser.py
+#args = parser.parse_args(lora) # configs in LoRaArgumentParser.py
 
 #     Slow+long range  Bw = 125 kHz, Cr = 4/8, Sf = 4096chips/symbol, CRC on. 13 dBm
 lora.set_pa_config(pa_select=1, max_power=21, output_power=15)

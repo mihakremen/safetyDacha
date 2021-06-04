@@ -1,3 +1,10 @@
+#!/usr/bin/env python3
+
+""" This program sends a response whenever it receives the "INF" """
+
+# Copyright 2018 Rui Silva.
+#
+# This file is part of rpsreal/pySX127x, fork of mayeranalytics/pySX127x.
 #
 # pySX127x is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public
 # License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later
@@ -29,21 +36,26 @@ class mylora(LoRa):
         super(mylora, self).__init__(verbose)
         self.set_mode(MODE.SLEEP)
         self.set_dio_mapping([0] * 6)
-        self.var=0
 
     def on_rx_done(self):
         BOARD.led_on()
         #print("\nRxDone")
         self.clear_irq_flags(RxDone=1)
-        payload = self.read_payload(nocheck=True)
+        payload = self.read_payload(nocheck=True )# Receive INF
         print ("Receive: ")
-        print(bytes(payload).decode("utf-8",'ignore')) # Receive DATA
+        mens=bytes(payload).decode("utf-8",'ignore')
+        mens=mens[2:-1] #to discard \x00\x00 and \x00 at the end
+        print(mens)
         BOARD.led_off()
-        time.sleep(1) # Wait for the client be ready
-        print ("Send: ACK")
-        self.write_payload([255, 255, 0, 0, 65, 67, 75, 0]) # Send ACK
-        self.set_mode(MODE.TX)
-        self.var=1
+        if mens=="INF":
+            print("Received data request INF")
+            time.sleep(2)
+            print ("Send mens: DATA RASPBERRY PI")
+            self.write_payload([255, 255, 0, 0, 68, 65, 84, 65, 32, 82, 65, 83, 80, 66, 69, 82, 82, 89, 32, 80, 73, 0]) # Send DATA RASPBERRY PI
+            self.set_mode(MODE.TX)
+        time.sleep(2)
+        self.reset_ptr_rx()
+        self.set_mode(MODE.RXCONT)
 
     def on_tx_done(self):
         print("\nTxDone")
@@ -69,41 +81,30 @@ class mylora(LoRa):
         print("\non_FhssChangeChannel")
         print(self.get_irq_flags())
 
-    def start(self):
+    def start(self):          
         while True:
-            while (self.var == 0):
-                print("Send: INF")
-                self.write_payload([255, 255, 0, 0, 73, 78, 70, 0])  # Send INF
-                self.set_mode(MODE.TX)
-                time.sleep(3)  # there must be a better solution but sleep() works
-                self.reset_ptr_rx()
-                self.set_mode(MODE.RXCONT)  # Receiver mode
-
-                start_time = time.time()
-                while (time.time() - start_time < 10):  # wait until receive data or 10s
-                    pass;
-
-                self.var = 0
-                self.reset_ptr_rx()
-                self.set_mode(MODE.RXCONT)  # Receiver mode
-                time.sleep(10)
+            self.reset_ptr_rx()
+            self.set_mode(MODE.RXCONT) # Receiver mode
+            while True:
+                pass;
+            
 
 lora = mylora(verbose=False)
-# args = parser.parse_args(lora) # configs in LoRaArgumentParser.py
+#args = parser.parse_args(lora) # configs in LoRaArgumentParser.py
 
 #     Slow+long range  Bw = 125 kHz, Cr = 4/8, Sf = 4096chips/symbol, CRC on. 13 dBm
 lora.set_pa_config(pa_select=1, max_power=21, output_power=15)
 lora.set_bw(BW.BW125)
 lora.set_coding_rate(CODING_RATE.CR4_8)
 lora.set_spreading_factor(12)
-lora.set_rx_crc(False)
+lora.set_rx_crc(True)
 #lora.set_lna_gain(GAIN.G1)
 #lora.set_implicit_header_mode(False)
 lora.set_low_data_rate_optim(True)
-lora.set_freq(868)
 
 #  Medium Range  Defaults after init are 434.0MHz, Bw = 125 kHz, Cr = 4/5, Sf = 128chips/symbol, CRC on 13 dBm
 #lora.set_pa_config(pa_select=1)
+
 
 
 assert(lora.get_agc_auto_on() == 1)
@@ -119,4 +120,4 @@ finally:
     sys.stdout.flush()
     print("Exit")
     lora.set_mode(MODE.SLEEP)
-    BOARD.teardown()
+BOARD.teardown()

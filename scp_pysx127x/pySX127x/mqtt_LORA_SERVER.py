@@ -50,7 +50,7 @@ class mylora(LoRa):
         print(mens)
         mosquitto.send_mqtt("safetyDacha/Device_1", mens)
         BOARD.led_off()
-        if mens=="INF":
+        if mens == "INF":
             print("Received data request INF")
             time.sleep(2)
             print("Send mens: DATA RASPBERRY PI")

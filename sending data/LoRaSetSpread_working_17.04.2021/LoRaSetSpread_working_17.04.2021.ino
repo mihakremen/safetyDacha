@@ -77,7 +77,7 @@ void setup() {
 
 void loop() {
   //  if (millis() - lastSendTime > interval) { откр                       //убираем учловие таймера в пользу WDT
-    String message = "Data:";   // send a message
+    String message = "Data:  ";   // send a message
     String temp = ("temp: " + String(bme.readTemperature()) + "  ");
     String hum = ("humidity: " + String(bme.readHumidity())+ "  ");
     String pres = ("Pressure" + String(bme.readPressure() / 100.0F)+ "  ");

@@ -28,10 +28,12 @@
 #include <avr/sleep.h>
 
 
+const int pin_water = 4;
 const int csPin = 7;          // LoRa radio chip select
 const int resetPin = 9;       // LoRa radio reset
 const int irqPin = 2;         // change for your board; must be a hardware interrupt pin
 
+String water;
 byte msgCount = 0;            // count of outgoing messages
 int interval = 2000;          // interval between sends
 long lastSendTime = 0;        // time of last packet send
@@ -76,13 +78,15 @@ void setup() {
 }
 
 void loop() {
-  //  if (millis() - lastSendTime > interval) { откр                       //убираем учловие таймера в пользу WDT
+  //  if (millis() - lastSendTime > interval) { откр                       //убираем уcловие таймера в пользу WDT
     String message = "Data:  ";   // send a message
     String temp = ("Temp:  " + String(bme.readTemperature()) + "  ");
     String hum = ("Humidity:  " + String(bme.readHumidity())+ "  ");
     String pres = ("Pressure:  " + String(bme.readPressure() / 100.0F));
+    get_water_sens();
+    String wat = ("Water sensor:  " + water);
 //    memcpy(&message[7], &temp, sizeof(float));
-    message += (temp + hum + pres);
+    message += (temp + hum + pres + wat);
     sendMessage(message);
     Serial.println("Sending:" + message );
     // lastSendTime = millis();            // timestamp the message
@@ -104,6 +108,16 @@ void loop() {
      sleep_enable();                                     // Разрешаем сон
      sleep_cpu();                                        // Уходим в сон
 
+}
+
+
+void get_water_sens() {
+  int buttonState = digitalRead(pin_water);
+  if (buttonState == 1) {
+      water = ("0");
+  }
+  else {water = ("1");}
+  return water;
 }
 
 void sendMessage(String outgoing) {

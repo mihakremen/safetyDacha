@@ -44,6 +44,7 @@ long lastSendTime = 0;        // time of last packet send
 Adafruit_BME280 bme;
 
 void setup() {
+  pinMode(pin_water, INPUT_PULLUP);
   power.autoCalibrate();
   Serial.begin(9600);                   // initialize serial
   while (!Serial);
@@ -84,11 +85,10 @@ void loop() {
     String message = "Data:  ";   // send a message
     String temp = ("Temp:  " + String(bme.readTemperature()) + "  ");
     String hum = ("Humidity:  " + String(bme.readHumidity())+ "  ");
-    String pres = ("Pressure:  " + String(bme.readPressure() / 100.0F));
+    String pres = ("Pressure:  " + String(bme.readPressure() / 100.0F) + "  ");
     get_water_sens();
-    String wat = ("Water sensor:  " + water);
-//    memcpy(&message[7], &temp, sizeof(float));
-    message += (temp + hum + pres + wat);
+    //String wat = ("Water sensor:  " + water);
+    message += (temp + hum + pres + "Water:  " + water);
     sendMessage(message);
     Serial.println("Sending:" + message );
     delay(50);

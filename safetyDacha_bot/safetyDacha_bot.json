@@ -1,1 +1,1362 @@
-[{"id":"d2a7149.d2ba6e8","type":"tab","label":"main","disabled":false,"info":""},{"id":"16f24810.a6a6f8","type":"telegram bot","botname":"safetyDacha","usernames":"","chatids":"","baseapiurl":"","updatemode":"polling","pollinterval":"300","usesocks":false,"sockshost":"","socksport":"6667","socksusername":"anonymous","sockspassword":"","bothost":"","botpath":"","localbotport":"8443","publicbotport":"8443","privatekey":"","certificate":"","useselfsignedcertificate":false,"sslterminated":false,"verboselogging":false},{"id":"d086776c.7de82","type":"telegram bot","botname":"HeinzBot","usernames":"","chatids":"","baseapiurl":"","updatemode":"polling","pollinterval":"300","usesocks":false,"sockshost":"","socksport":"6667","socksusername":"anonymous","sockspassword":"","bothost":"","localbotport":"8443","publicbotport":"8443","privatekey":"","certificate":"","useselfsignedcertificate":false,"sslterminated":false,"verboselogging":false},{"id":"1f3cb0bd.e0c34f","type":"telegram bot","z":"d2a7149.d2ba6e8","botname":"HeinzBot"},{"id":"ff78bc5a.00874","type":"telegram bot","z":"d2a7149.d2ba6e8","botname":"HeinzBot","usernames":"","chatids":""},{"id":"5f67fb38.18d094","type":"telegram bot","botname":"HeinzBot","usernames":"","chatids":"","baseapiurl":"","updatemode":"polling","pollinterval":"300","usesocks":false,"sockshost":"","socksport":"6667","socksusername":"anonymous","sockspassword":"","bothost":"","botpath":"","localbotport":"8443","publicbotport":"8443","privatekey":"","certificate":"","useselfsignedcertificate":false,"sslterminated":false,"verboselogging":false},{"id":"51f2e3df.4696bc","type":"mqtt-broker","name":"mosquitto_on_google","broker":"35.198.104.194","port":"1883","clientid":"","usetls":false,"protocolVersion":"4","keepalive":"60","cleansession":true,"birthTopic":"","birthQos":"0","birthPayload":"","birthMsg":{},"closeTopic":"","closeQos":"0","closePayload":"","closeMsg":{},"willTopic":"","willQos":"0","willPayload":"","willMsg":{},"sessionExpiry":""},{"id":"233d0697.0c2c6a","type":"telegram bot","botname":"HeinzBot","usernames":"","chatids":""},{"id":"cd3e5352.717538","type":"debug","z":"d2a7149.d2ba6e8","name":"Debug","active":true,"tosidebar":true,"console":false,"tostatus":false,"complete":"true","targetType":"full","statusVal":"","statusType":"auto","x":250,"y":140,"wires":[]},{"id":"db28aeae.a44ba8","type":"function","z":"d2a7149.d2ba6e8","name":"hello message","func":"context.global.AllId = [];\ncontext.global.keyboard = { pending : true };\n\n\nvar opts = {\n  reply_to_message_id: msg.payload.messageId,\n  reply_markup: JSON.stringify({\n    keyboard: [\n      ['Функции'],['Показатели'],['/help']],\n      'resize_keyboard' : true, \n      'one_time_keyboard' : true\n  })\n};\n\n\nmsg.payload.content = (\"Приветсвуем Вас и благодарим за приобретение и\" +\n\" использование нашего оборудования!\" );\nmsg.payload.options = opts;\n\nif (context.global.AllId.includes(msg.payload.chatId) == false) {\n    context.global.AllId.push(msg.payload.chatId);\n}\n\nreturn [ msg ];\n","outputs":"1","noerr":0,"initialize":"","finalize":"","libs":[],"x":280,"y":180,"wires":[["b42fe1e0.7bc34"]]},{"id":"cc400aac.97c5f8","type":"telegram command","z":"d2a7149.d2ba6e8","name":"Старт","command":"/start","bot":"16f24810.a6a6f8","strict":false,"hasresponse":true,"useregex":false,"removeregexcommand":false,"outputs":2,"x":80,"y":200,"wires":[["db28aeae.a44ba8","cd3e5352.717538"],[]]},{"id":"e4c03988.e0f2b8","type":"function","z":"d2a7149.d2ba6e8","d":true,"name":"copy","func":"msg.payload.copy = { chatId : -292227168 };\n\nmsg.payload.copy.options = {\n    disable_notification : true\n};\n\nreturn msg;","outputs":1,"noerr":0,"initialize":"","finalize":"","libs":[],"x":510,"y":1560,"wires":[["f3c0cd9c.e5a4e"]]},{"id":"f3c0cd9c.e5a4e","type":"telegram sender","z":"d2a7149.d2ba6e8","d":true,"name":"","bot":"16f24810.a6a6f8","haserroroutput":false,"outputs":1,"x":740,"y":1560,"wires":[[]]},{"id":"db682798.f64838","type":"telegram command","z":"d2a7149.d2ba6e8","d":true,"name":"","command":"Старт","bot":"16f24810.a6a6f8","strict":false,"hasresponse":true,"useregex":false,"removeregexcommand":false,"outputs":2,"x":290,"y":1560,"wires":[[],["e4c03988.e0f2b8"]]},{"id":"988b120b.d94a8","type":"mqtt in","z":"d2a7149.d2ba6e8","name":"","topic":"safetyDacha/Device_1","qos":"0","datatype":"auto","broker":"51f2e3df.4696bc","nl":false,"rap":true,"rh":0,"x":560,"y":200,"wires":[["85aa2bc2.c0c048","80cca428.885548"]]},{"id":"85aa2bc2.c0c048","type":"function","z":"d2a7149.d2ba6e8","name":"separate data","func":"let device_data = msg.payload;\nconst indicators = device_data.split(\"  \");\nlet temp = indicators [2];\nlet hum = indicators [4];\nlet pres = indicators [6];\nlet water = indicators [8];\n\ncontext.global.sensors_data = {\n    hum: hum,\n    temp: temp,\n    pres: pres,\n    water: water\n}\n\nreturn msg;","outputs":1,"noerr":0,"initialize":"","finalize":"","libs":[],"x":820,"y":160,"wires":[["9c598236.e9cb4","e4e943b3.44507","45becda9.a872b4"]]},{"id":"eb6e8a87.a188b8","type":"telegram command","z":"d2a7149.d2ba6e8","name":"Показатели","command":"Показатели","bot":"16f24810.a6a6f8","strict":false,"hasresponse":true,"useregex":false,"removeregexcommand":false,"outputs":2,"x":870,"y":360,"wires":[["e7230c6.227cff"],[]]},{"id":"7c75c797.ffbb78","type":"telegram sender","z":"d2a7149.d2ba6e8","name":"send indecators","bot":"16f24810.a6a6f8","haserroroutput":false,"outputs":1,"x":1320,"y":340,"wires":[[]]},{"id":"e7230c6.227cff","type":"function","z":"d2a7149.d2ba6e8","name":"send collected data","func":"context.global.keyboard = { pending : true };\n\n\nvar opts = {\n  reply_to_message_id: msg.payload.messageId,\n  reply_markup: JSON.stringify({\n    keyboard: [\n      ['Функции'],['Показатели'],['/help']],\n //     ['No']],\n      'resize_keyboard' : true, \n      'one_time_keyboard' : true\n  })\n};\n\n\nindicators = msg.payload;\nlet sending_data = (\n    \"Последние показатели\\n\" +\n    \"Температура: \" + context.global.sensors_data.temp + \"\\n\" +\n    \"Влажность: \" + context.global.sensors_data.hum + \"\\n\" +\n    \"Давление: \" + context.global.sensors_data.pres + \"\\n\"\n    )\n\nmsg.payload = \n{\n    chatId : msg.payload.chatId,\n    type : \"message\",\n    content : sending_data,\n    options: opts\n};\n\nreturn [msg];","outputs":1,"noerr":0,"initialize":"","finalize":"","libs":[],"x":1090,"y":360,"wires":[["7c75c797.ffbb78"]]},{"id":"7bf5e4e9.495b74","type":"telegram sender","z":"d2a7149.d2ba6e8","d":true,"name":"","bot":"233d0697.0c2c6a","haserroroutput":false,"outputs":1,"x":530,"y":1520,"wires":[[]]},{"id":"a35c4e19.9ed248","type":"function","z":"d2a7149.d2ba6e8","d":true,"name":"contact","func":"msg.payload =\n{\n    chatId : 312796713,\n    type : \"contact\",\n    content :\n    {\n        phone_number: \"+49 30 987654321\",\n        first_name: \"Max\",\n        last_name: \"Mustermann\"\n    },\n    options :\n    {\n        disable_notification : true\n    }\n}\n\nreturn msg;\n","outputs":1,"noerr":0,"initialize":"","finalize":"","libs":[],"x":339.66669845581055,"y":1520.3333539962769,"wires":[["7bf5e4e9.495b74"]]},{"id":"b9f0a60f.c5efb8","type":"inject","z":"d2a7149.d2ba6e8","d":true,"name":"","props":[{"p":"payload"},{"p":"topic","vt":"str"}],"repeat":"","crontab":"","once":false,"onceDelay":"","topic":"","payload":"","payloadType":"str","x":161.66668701171875,"y":1519.6667280197144,"wires":[["a35c4e19.9ed248"]]},{"id":"edcf10da.82f94","type":"telegram sender","z":"d2a7149.d2ba6e8","d":true,"name":"send initial message","bot":"16f24810.a6a6f8","haserroroutput":false,"outputs":1,"x":540,"y":1440,"wires":[["db8e5a96.69f8f8"]]},{"id":"d338f266.95ff8","type":"function","z":"d2a7149.d2ba6e8","d":true,"name":"original message","func":"msg.payload.type = 'message'\nmsg.payload.content = 'The original message';\nreturn [ msg ];\n","outputs":"1","noerr":0,"initialize":"","finalize":"","libs":[],"x":238.99982452392578,"y":1440.9999179840088,"wires":[["edcf10da.82f94"]]},{"id":"8c682765.b34cf8","type":"telegram command","z":"d2a7149.d2ba6e8","d":true,"name":"/foo","command":"/foo","bot":"16f24810.a6a6f8","strict":false,"hasresponse":false,"useregex":false,"removeregexcommand":false,"outputs":1,"x":59.99989318847656,"y":1446.9998998641968,"wires":[["d338f266.95ff8"]]},{"id":"ad64ec3d.4d2b4","type":"telegram sender","z":"d2a7149.d2ba6e8","d":true,"name":"","bot":"16f24810.a6a6f8","haserroroutput":false,"outputs":1,"x":587.2405776977539,"y":1646.696689605713,"wires":[["3499a9a6.8ae146"]]},{"id":"3dc83d60.7cbcc2","type":"function","z":"d2a7149.d2ba6e8","d":true,"name":"modified message","func":"var messageId = context.global.messageId;\nvar chatId = context.global.chatId;\n\nvar options = {\n    chat_id : chatId,\n    message_id : messageId\n};\n\nmsg.payload = {\n    type : 'editMessageText',\n    content : \"jopa\",\n    options : options,\n}\n\nreturn [ msg ];\n","outputs":"1","noerr":0,"initialize":"","finalize":"","libs":[],"x":307.2405776977539,"y":1646.696689605713,"wires":[["ad64ec3d.4d2b4"]]},{"id":"db8e5a96.69f8f8","type":"function","z":"d2a7149.d2ba6e8","d":true,"name":"save IDs","func":"// We store the messageId to be able to edit this reply in the callback query. \ncontext.global.messageId = msg.payload.sentMessageId;\ncontext.global.chatId = msg.payload.chatId;\nreturn [ msg ];\n","outputs":"1","noerr":0,"initialize":"","finalize":"","libs":[],"x":737.9073638916016,"y":1440.3634023666382,"wires":[[]]},{"id":"3499a9a6.8ae146","type":"debug","z":"d2a7149.d2ba6e8","d":true,"name":"","active":true,"tosidebar":true,"console":false,"tostatus":false,"complete":"payload","targetType":"msg","statusVal":"","statusType":"auto","x":810,"y":1660,"wires":[]},{"id":"b55fa9d6.a7e438","type":"inject","z":"d2a7149.d2ba6e8","d":true,"name":"","props":[{"p":"payload"},{"p":"topic","vt":"str"}],"repeat":"","crontab":"","once":false,"onceDelay":0.1,"topic":"","payload":"jopa","payloadType":"str","x":110,"y":1660,"wires":[["3dc83d60.7cbcc2"]]},{"id":"b42fe1e0.7bc34","type":"telegram sender","z":"d2a7149.d2ba6e8","name":"","bot":"16f24810.a6a6f8","haserroroutput":false,"outputs":1,"x":150,"y":320,"wires":[["6a403314.20458c"]]},{"id":"55ced553.2af13c","type":"debug","z":"d2a7149.d2ba6e8","name":"","active":true,"tosidebar":true,"console":false,"tostatus":false,"complete":"payload","targetType":"msg","statusVal":"","statusType":"auto","x":1510,"y":280,"wires":[]},{"id":"80cca428.885548","type":"debug","z":"d2a7149.d2ba6e8","name":"","active":true,"tosidebar":true,"console":false,"tostatus":false,"complete":"false","statusVal":"","statusType":"auto","x":630,"y":80,"wires":[]},{"id":"d5cabb97.cb6ef8","type":"function","z":"d2a7149.d2ba6e8","d":true,"name":"alert_temp_old","func":"context.global.alert_temp_qty;\n\nvar temp = (context.global.sensors_data.temp);\n\nif (temp >= 25)  {\n    context.global.alert_temp_qty += 1;\n}\n\nlet alert_temp_msg = (\"Внимание! Температура на датчике \" + temp + \" C! Есть вероятность возгарания.\");\n\n\nif (context.global.alert_temp_qty >= 3) {\n    //let alert_temp_msg = (\"Внимание! Температура на датчике \" + temp + \" C! Есть вероятность возгарания.\");\n    msg.payload = {\n        chatId : context.global.AllId, /*msg.payload.chatId*/\n        type : \"message\",\n        content : alert_temp_msg\n    \n   };\n   context.global.alert_temp_qty = 0;\n}\n\n\nreturn msg;","outputs":1,"noerr":0,"initialize":"","finalize":"","libs":[],"x":1260,"y":1480,"wires":[[]]},{"id":"87807b05.f16228","type":"telegram sender","z":"d2a7149.d2ba6e8","name":"send alert","bot":"16f24810.a6a6f8","haserroroutput":false,"outputs":1,"x":1320,"y":40,"wires":[[]]},{"id":"6a403314.20458c","type":"function","z":"d2a7149.d2ba6e8","name":"help message","func":"context.global.keyboard = { pending : true };\n\n\nvar opts = {\n//  reply_to_message_id: msg.payload.messageId,\n  reply_markup: JSON.stringify({\n    keyboard: [\n     ['Функции'],['Показатели'],['/help']],\n //     ['No']],\n      'resize_keyboard' : true, \n      'one_time_keyboard' : true\n  })\n};\n\nlet help_msg = (\"Бот SafetyDacha позволяет вам следить за показателями \" + \n\" температуры, влажности, атмосферного давления и затопления на вашем\" + \n\" участке.\" +\n\"\\nКоманды бота: \\n /help - вывести данное сообщение с информацией\" + \n\" о командах и функциях бота \\n \" +\n\"/info - ❗️❗️❗️РЕКОМЕНДУЕТСЯ К ИЗУЧЕНИЮ   вывести информацию о значени\"+\n\"ях параметров датчиков\"+\n\"\\n/func или Функции - отобразить доступные функции\"+\n\"\\n/sensors или Показатели - вывести последние данные с датчиков \\n\"\n);\n\n\nmsg.payload.content = help_msg;\nmsg.payload.options = opts;\n\n\n\nreturn [ msg ];\n","outputs":"1","noerr":0,"initialize":"","finalize":"","libs":[],"x":340,"y":420,"wires":[["11f5534b.5696bd"]]},{"id":"8e0101d9.83c59","type":"telegram command","z":"d2a7149.d2ba6e8","name":"Помощь","command":"Помощь","bot":"16f24810.a6a6f8","strict":false,"hasresponse":true,"useregex":false,"removeregexcommand":false,"outputs":2,"x":120,"y":420,"wires":[["6a403314.20458c"],[]]},{"id":"1c78df93.65b46","type":"debug","z":"d2a7149.d2ba6e8","name":"","active":true,"tosidebar":true,"console":false,"tostatus":false,"complete":"payload","targetType":"msg","statusVal":"","statusType":"auto","x":350,"y":40,"wires":[]},{"id":"11f5534b.5696bd","type":"telegram sender","z":"d2a7149.d2ba6e8","name":"","bot":"16f24810.a6a6f8","haserroroutput":false,"outputs":1,"x":610,"y":420,"wires":[[]]},{"id":"890e9f78.9439c","type":"telegram command","z":"d2a7149.d2ba6e8","name":"/help","command":"/help","bot":"16f24810.a6a6f8","strict":false,"hasresponse":true,"useregex":false,"removeregexcommand":false,"outputs":2,"x":110,"y":480,"wires":[["6a403314.20458c"],[]]},{"id":"9c598236.e9cb4","type":"function","z":"d2a7149.d2ba6e8","name":"alert_water","func":"if (context.global.water_noti == 1) {\nvar wat_qty = global.get(\"wat_qty\") || 0;\n\nvar wat = (context.global.sensors_data.water);\n\nif (wat == 1)  {\n    wat_qty += 1;\n    global.set('wat_qty',wat_qty);\n}\n\nlet alert_water_msg = (\"Внимание! Сработал датчик протечки.\"+\n\"Отключить уведомления на 1 час: /water_noti_off\");\n\n\nif (wat_qty >= 3) {\n    //let alert_temp_msg = (\"Внимание! Температура на датчике \" + temp + \" C! Есть вероятность возгарания.\");\n    msg.payload = {\n        chatId : context.global.AllId, /*msg.payload.chatId*/\n        type : \"message\",\n        content : alert_water_msg\n    \n   };\n  \n   wat_qty = 0;\n   global.set('wat_qty',wat_qty);\n}\n}\n\nreturn msg;","outputs":1,"noerr":0,"initialize":"// Добавленный здесь код будет исполняться\n// однократно при развертывании узла.\ncontext.global.water_noti = 1;\nwat_qty = 0;\n   global.set('wat_qty',wat_qty);","finalize":"","libs":[],"x":1090,"y":120,"wires":[["30a96dfe.4f9c72"]]},{"id":"30a96dfe.4f9c72","type":"telegram sender","z":"d2a7149.d2ba6e8","name":"send alert","bot":"16f24810.a6a6f8","haserroroutput":false,"outputs":1,"x":1320,"y":100,"wires":[[]]},{"id":"cd7d6e42.1e766","type":"telegram sender","z":"d2a7149.d2ba6e8","name":"send alert","bot":"16f24810.a6a6f8","haserroroutput":false,"outputs":1,"x":1320,"y":160,"wires":[[]]},{"id":"e4e943b3.44507","type":"function","z":"d2a7149.d2ba6e8","name":"alert_hum","func":"if (context.global.hum_noti == 1) {\n    var hum_qty = global.get(\"hum_qty\") || 0;\n    \n    var hum = (context.global.sensors_data.hum);\n    \n    if (hum >= 65)  {\n        hum_qty += 1;\n        global.set('hum_qty',hum_qty);\n    }\n    \n    let alert_hum_msg = (\"Внимание! Влажность превышает \" + hum + \n    \"%! Это может привести к порче имущества. \\n Больше информации: /info\" +\n    \"\\n Отключить уведомления на 1 час: /hum_noti_off\");\n    \n    \n    if (hum_qty >= 3) {\n        //let alert_temp_msg = (\"Внимание! Температура на датчике \" + temp + \" C! Есть вероятность возгарания.\");\n        msg.payload = {\n            chatId : context.global.AllId, /*msg.payload.chatId*/\n            type : \"message\",\n            content : alert_hum_msg\n        \n       };\n      \n       hum_qty = 0;\n       global.set('hum_qty',hum_qty);\n    }\n}\n\nreturn msg;","outputs":1,"noerr":0,"initialize":"// Добавленный здесь код будет исполняться\n// однократно при развертывании узла.\ncontext.global.hum_noti = 1;\nhum_qty = 0;\n       global.set('hum_qty',hum_qty);","finalize":"","libs":[],"x":1080,"y":180,"wires":[["cd7d6e42.1e766"]]},{"id":"2ccd8e60.4b48d2","type":"function","z":"d2a7149.d2ba6e8","d":true,"name":"alert_temp","func":"var count = global.get(\"count\") || 0;\n\nvar temp = (context.global.sensors_data.temp);\n\nif (temp >= 47)  {\n    count += 1;\n    global.set('count',count);\n}\n\nlet alert_temp_msg = (\"Внимание! Температура на датчике \" + temp + \" C! Есть вероятность возгарания.\");\n\n\nif (count >= 3) {\n    //let alert_temp_msg = (\"Внимание! Температура на датчике \" + temp + \" C! Есть вероятность возгарания.\");\n    msg.payload = {\n        chatId : context.global.AllId, /*msg.payload.chatId*/\n        type : \"message\",\n        content : alert_temp_msg\n    \n   };\n  \n   count = 0;\n   global.set('count',count);\n}\n\n\nreturn msg;","outputs":1,"noerr":0,"initialize":"","finalize":"","libs":[],"x":1210,"y":1440,"wires":[[]]},{"id":"45becda9.a872b4","type":"function","z":"d2a7149.d2ba6e8","name":"alert_temp_test","func":"if (context.global.temp_noti == 1) {\n    var count_test = global.get(\"count_test\") || 0;\n    \n    var temp = (context.global.sensors_data.temp);\n    \n    if (temp >= 47)  {\n        count_test += 1;\n        global.set('count_test',count_test);\n    }\n    \n    let alert_temp_msg = (\"Внимание! Температура на датчике \" + temp + \n    \" °C! Есть вероятность возгарания. Отключить уведомления на 1 час: /temp_noti_off\" );\n    \n    \n    if (count_test >= 3) {\n        //let alert_temp_msg = (\"Внимание! Температура на датчике \" + temp + \" C! Есть вероятность возгарания.\");\n        msg.payload = {\n            chatId : context.global.AllId, /*msg.payload.chatId*/\n            type : \"message\",\n            content : alert_temp_msg\n        \n       };\n      \n       count_test = 0;\n       global.set('count_test',count_test);\n    }\n\n}\nreturn msg;","outputs":1,"noerr":0,"initialize":"// Добавленный здесь код будет исполняться\n// однократно при развертывании узла.\ncontext.global.temp_noti = 1;\ncount_test = 0;\n       global.set('count_test',count_test);","finalize":"","libs":[],"x":1100,"y":60,"wires":[["87807b05.f16228"]]},{"id":"ad184dca.0e9fc","type":"function","z":"d2a7149.d2ba6e8","name":"enter_device_id message","func":"context.global.keyboard = { pending : true };\n\n\nvar opts = {\n//  reply_to_message_id: msg.payload.messageId,\n  reply_markup: JSON.stringify({\n    keyboard: [\n      ['Функции'],['Показатели'],['/help']],\n //     ['No']],\n      'resize_keyboard' : true, \n      'one_time_keyboard' : true\n  })\n};\n\n\nmsg.payload.content = ('Уведомления о температуре отключены на 1 час ');\nmsg.payload.options = opts;\ncontext.global.temp_noti = 0;\n\n\nreturn [ msg ];\n","outputs":"1","noerr":0,"initialize":"","finalize":"","libs":[],"x":1170,"y":620,"wires":[["933c2bb0.a04458","80efbc6.45b5d4"]]},{"id":"e63d8394.8965a","type":"telegram command","z":"d2a7149.d2ba6e8","name":"Отключить уведомления о температуре","command":"/temp_noti_off","bot":"16f24810.a6a6f8","strict":false,"hasresponse":true,"useregex":false,"removeregexcommand":false,"outputs":2,"x":960,"y":540,"wires":[["ad184dca.0e9fc"],[]]},{"id":"933c2bb0.a04458","type":"telegram sender","z":"d2a7149.d2ba6e8","name":"","bot":"16f24810.a6a6f8","haserroroutput":false,"outputs":1,"x":1350,"y":480,"wires":[[]]},{"id":"80efbc6.45b5d4","type":"delay","z":"d2a7149.d2ba6e8","name":"","pauseType":"delay","timeout":"10","timeoutUnits":"seconds","rate":"1","nbRateUnits":"1","rateUnits":"second","randomFirst":"1","randomLast":"5","randomUnits":"seconds","drop":false,"x":1400,"y":620,"wires":[["41394cae.08f994"]]},{"id":"41394cae.08f994","type":"function","z":"d2a7149.d2ba6e8","name":"enter_device_id message","func":"context.global.keyboard = { pending : true };\n\n\nvar opts = {\n//  reply_to_message_id: msg.payload.messageId,\n  reply_markup: JSON.stringify({\n    keyboard: [\n      ['Функции'],['Показатели'],['/help']],\n //     ['No']],\n      'resize_keyboard' : true, \n      'one_time_keyboard' : true\n  })\n};\n\n\nmsg.payload.content = ('Уведомления о температуре возобновлены ');\nmsg.payload.options = opts;\ncontext.global.temp_noti = 1;\n\n\nreturn [ msg ];\n","outputs":"1","noerr":0,"initialize":"","finalize":"","libs":[],"x":1610,"y":620,"wires":[["abf71ee1.f4846"]]},{"id":"abf71ee1.f4846","type":"telegram sender","z":"d2a7149.d2ba6e8","name":"","bot":"16f24810.a6a6f8","haserroroutput":false,"outputs":1,"x":1770,"y":480,"wires":[[]]},{"id":"d4656358.cf90a","type":"function","z":"d2a7149.d2ba6e8","name":"enter_device_id message","func":"context.global.keyboard = { pending : true };\n\n\nvar opts = {\n//  reply_to_message_id: msg.payload.messageId,\n  reply_markup: JSON.stringify({\n    keyboard: [\n     ['Функции'],['Показатели'],['/help']],\n //     ['No']],\n      'resize_keyboard' : true, \n      'one_time_keyboard' : true\n  })\n};\n\n\nmsg.payload.content = ('Уведомления о протечке отключены на 1 час ');\nmsg.payload.options = opts;\ncontext.global.water_noti = 0;\n\n\nreturn [ msg ];\n","outputs":"1","noerr":0,"initialize":"","finalize":"","libs":[],"x":1170,"y":860,"wires":[["2645c1ff.7a022e","21ea8816.9d78c8"]]},{"id":"d70edd6.8a17d2","type":"telegram command","z":"d2a7149.d2ba6e8","name":"Отключить уведомления датчика протечки","command":"/water_noti_off","bot":"16f24810.a6a6f8","strict":false,"hasresponse":true,"useregex":false,"removeregexcommand":false,"outputs":2,"x":970,"y":780,"wires":[["d4656358.cf90a"],[]]},{"id":"2645c1ff.7a022e","type":"telegram sender","z":"d2a7149.d2ba6e8","name":"","bot":"16f24810.a6a6f8","haserroroutput":false,"outputs":1,"x":1350,"y":720,"wires":[[]]},{"id":"21ea8816.9d78c8","type":"delay","z":"d2a7149.d2ba6e8","name":"","pauseType":"delay","timeout":"10","timeoutUnits":"seconds","rate":"1","nbRateUnits":"1","rateUnits":"second","randomFirst":"1","randomLast":"5","randomUnits":"seconds","drop":false,"x":1400,"y":860,"wires":[["2f594452.bcc37c"]]},{"id":"2f594452.bcc37c","type":"function","z":"d2a7149.d2ba6e8","name":"enter_device_id message","func":"context.global.keyboard = { pending : true };\n\n\nvar opts = {\n//  reply_to_message_id: msg.payload.messageId,\n  reply_markup: JSON.stringify({\n    keyboard: [\n      ['Функции'],['Показатели'],['/help']],\n //     ['No']],\n      'resize_keyboard' : true, \n      'one_time_keyboard' : true\n  })\n};\n\n\nmsg.payload.content = ('Уведомления о протечке возобновлены ');\nmsg.payload.options = opts;\ncontext.global.water_noti = 1;\n\n\nreturn [ msg ];\n","outputs":"1","noerr":0,"initialize":"","finalize":"","libs":[],"x":1610,"y":860,"wires":[["e8dd19cc.f4c898"]]},{"id":"e8dd19cc.f4c898","type":"telegram sender","z":"d2a7149.d2ba6e8","name":"","bot":"16f24810.a6a6f8","haserroroutput":false,"outputs":1,"x":1770,"y":720,"wires":[[]]},{"id":"15ab2549.0fbbab","type":"function","z":"d2a7149.d2ba6e8","name":"enter_device_id message","func":"context.global.keyboard = { pending : true };\n\n\nvar opts = {\n//  reply_to_message_id: msg.payload.messageId,\n  reply_markup: JSON.stringify({\n    keyboard: [\n      ['Функции'],['Показатели'],['/help']],\n //     ['No']],\n      'resize_keyboard' : true, \n      'one_time_keyboard' : true\n  })\n};\n\n\nmsg.payload.content = ('Уведомления о влажности отключены на 1 час ');\nmsg.payload.options = opts;\ncontext.global.hum_noti = 0;\n\n\nreturn [ msg ];\n","outputs":"1","noerr":0,"initialize":"","finalize":"","libs":[],"x":1210,"y":1060,"wires":[["7caefe24.0221b","d5f33fa3.f8992"]]},{"id":"78ba85a6.d270bc","type":"telegram command","z":"d2a7149.d2ba6e8","name":"Отключить уведомления о влажности","command":"/hum_noti_off","bot":"16f24810.a6a6f8","strict":false,"hasresponse":true,"useregex":false,"removeregexcommand":false,"outputs":2,"x":990,"y":980,"wires":[["15ab2549.0fbbab"],[]]},{"id":"7caefe24.0221b","type":"telegram sender","z":"d2a7149.d2ba6e8","name":"","bot":"16f24810.a6a6f8","haserroroutput":false,"outputs":1,"x":1390,"y":920,"wires":[[]]},{"id":"d5f33fa3.f8992","type":"delay","z":"d2a7149.d2ba6e8","name":"","pauseType":"delay","timeout":"10","timeoutUnits":"seconds","rate":"1","nbRateUnits":"1","rateUnits":"second","randomFirst":"1","randomLast":"5","randomUnits":"seconds","drop":false,"x":1440,"y":1060,"wires":[["8a2d1a47.56f198"]]},{"id":"8a2d1a47.56f198","type":"function","z":"d2a7149.d2ba6e8","name":"enter_device_id message","func":"context.global.keyboard = { pending : true };\n\n\nvar opts = {\n//  reply_to_message_id: msg.payload.messageId,\n  reply_markup: JSON.stringify({\n    keyboard: [\n     ['Функции'],['Показатели'],['/help']],\n //     ['No']],\n      'resize_keyboard' : true, \n      'one_time_keyboard' : true\n  })\n};\n\n\nmsg.payload.content = ('Уведомления о влажности возобновлены');\nmsg.payload.options = opts;\ncontext.global.hum_noti = 1;\n\n\nreturn [ msg ];\n","outputs":"1","noerr":0,"initialize":"","finalize":"","libs":[],"x":1710,"y":1040,"wires":[["4cdd6a26.b9e2a4"]]},{"id":"4cdd6a26.b9e2a4","type":"telegram sender","z":"d2a7149.d2ba6e8","name":"","bot":"16f24810.a6a6f8","haserroroutput":false,"outputs":1,"x":1970,"y":940,"wires":[[]]},{"id":"f70a13c1.b316c","type":"telegram command","z":"d2a7149.d2ba6e8","name":"/sensors","command":"/sensors","bot":"16f24810.a6a6f8","strict":false,"hasresponse":true,"useregex":false,"removeregexcommand":false,"outputs":2,"x":880,"y":420,"wires":[["e7230c6.227cff"],[]]},{"id":"3b5d4351.6bf68c","type":"telegram command","z":"d2a7149.d2ba6e8","name":"Включить уведомления о протечке","command":"/water_noti_on","bot":"16f24810.a6a6f8","strict":false,"hasresponse":true,"useregex":false,"removeregexcommand":false,"outputs":2,"x":1480,"y":800,"wires":[["2f594452.bcc37c"],[]]},{"id":"be78d3f8.d55e7","type":"telegram command","z":"d2a7149.d2ba6e8","name":"Включить уведомления о температуре","command":"/temp_noti_on","bot":"16f24810.a6a6f8","strict":false,"hasresponse":true,"useregex":false,"removeregexcommand":false,"outputs":2,"x":1500,"y":560,"wires":[["41394cae.08f994"],[]]},{"id":"af8153cc.d9b1a","type":"telegram command","z":"d2a7149.d2ba6e8","name":"Включить уведомления о влажности","command":"/hum_noti_on","bot":"16f24810.a6a6f8","strict":false,"hasresponse":true,"useregex":false,"removeregexcommand":false,"outputs":2,"x":1530,"y":980,"wires":[["8a2d1a47.56f198"],[]]},{"id":"db588156.f1bd2","type":"telegram receiver","z":"d2a7149.d2ba6e8","name":"","bot":"16f24810.a6a6f8","saveDataDir":"","filterCommands":false,"x":140,"y":80,"wires":[["1c78df93.65b46"],[]]},{"id":"b10ceff1.bbcde","type":"function","z":"d2a7149.d2ba6e8","name":"func message","func":"context.global.keyboard = { pending : true };\n\n\nvar opts = {\n//  reply_to_message_id: msg.payload.messageId,\n  reply_markup: JSON.stringify({\n   keyboard: [\n      ['Функции'],['Показатели'],['/help']],\n //     ['No']],\n      'resize_keyboard' : true, \n      'one_time_keyboard' : true\n  })\n};\n\n\nmsg.payload.content = (\"Функции:\\n\\n/sensors - вывести последние\"+\n\" данные с датчиков\"+\n\"\\n/help - вывести сообщение с информацией о командах и функциях бота\"+\n\"\\n/info - ❗️❗️❗️РЕКОМЕНДУЕТСЯ К ИЗУЧЕНИЮ   вывести данное\"+\n\"сообщение с информацией о значени\"+\n\"ях параметров датчиков\"+\n\"\\n\\n ✉️Уведомления о показателях✉️\"+\n\"\\n\\nУведомления о температуре:\"+\n\"\\n/temp_noti_off - Отключить уведомления о температуре на 1 час\"+\n\"\\n/temp_noti_on - Возобновить уведомления о температуре\"+\n\"\\n\\nУведомления о протечке:\"+\n\"\\n/water_noti_off - Отключить уведомления о протечке на 1 час\"+\n\"\\n/water_noti_on - Возобновить уведомления о протечке\"+\n\"\\n\\nУведомления о влажности:\"+\n\"\\n/hum_noti_off - Отключить уведомления о влажности на 1 час\"+\n\"\\n/hum_noti_on - Возобновить уведомления о влажности\"\n\n);\nmsg.payload.options = opts;\n\n\n\nreturn [ msg ];\n","outputs":"1","noerr":0,"initialize":"","finalize":"","libs":[],"x":320,"y":600,"wires":[["3648db6d.9993c4"]]},{"id":"a52d6e6c.6f1a2","type":"telegram command","z":"d2a7149.d2ba6e8","name":"Функции","command":"Функции","bot":"16f24810.a6a6f8","strict":false,"hasresponse":true,"useregex":false,"removeregexcommand":false,"outputs":2,"x":120,"y":580,"wires":[["b10ceff1.bbcde"],[]]},{"id":"3648db6d.9993c4","type":"telegram sender","z":"d2a7149.d2ba6e8","name":"","bot":"16f24810.a6a6f8","haserroroutput":false,"outputs":1,"x":590,"y":600,"wires":[[]]},{"id":"e6910ee8.cf63d","type":"telegram command","z":"d2a7149.d2ba6e8","name":"/info","command":"/info","bot":"16f24810.a6a6f8","strict":false,"hasresponse":true,"useregex":false,"removeregexcommand":false,"outputs":2,"x":170,"y":780,"wires":[["cc38612c.adeab"],[]]},{"id":"cc38612c.adeab","type":"function","z":"d2a7149.d2ba6e8","name":"info message","func":"context.global.keyboard = { pending : true };\n\n\nvar opts = {\n//  reply_to_message_id: msg.payload.messageId,\n  reply_markup: JSON.stringify({\n    keyboard: [\n      ['Функции'],['Показатели'],['/help']],\n //     ['No']],\n      'resize_keyboard' : true, \n      'one_time_keyboard' : true\n  })\n};\n\nlet info_msg = (\"Расширенная информация об использовании бота SafetyDacha\"+\n\"\\n\\nТемпература\\nУказано значение в градусах цельсия. \" +\n\"При значении больше 45 вам придет уведомление о возможном возгорании\" +\n\"\\n\\nВлажность \\nОтображается в процентах и ее оптимальное значение: \" +\n\"30–45% зимой и 30–60% летом. Если влажность в помещении подниметя \" +\n\"выше 65%, то вы получите соответсвующее уведомление. Это может \" +\n\"означать, что во время осадков внутрь попадает слишком много влаги, \" +\n\"что плохо сказывается на имуществе внутри и на самом строении\" +\n\"\\n\\nДавление \\nОтображает атмосферное давление в миллиметрах \"+\n\"ртутного столба\" + \n\"\\n\\nДатчик протечки\\nПредставляет собой два провода, которые \"+ \n\"кладутся близко к месту вероятного начала затопления. При появлении \" +\n\"в этом месте воды контакты замыкаются и датчик сообщает вам о \" +\n\"возможном затоплении.\" + \n\"\\n\\nКоманды бота: \\n /help - вывести сообщение с информацией\" + \n\" о командах и функциях бота\"+\n\"\\n/info - ❗️❗️❗️РЕКОМЕНДУЕТСЯ К ИЗУЧЕНИЮ   вывести данное\"+\n\"сообщение с информацией о значени\"+\n\"ях параметров датчиков\"+\n\"\\n/func или Функции - отобразить доступные функции\"+\n\"\\n/sensors или Показатели - вывести последние данные с датчиков \\n\"\n\n\n);\n\n\nmsg.payload.content = info_msg;\nmsg.payload.options = opts;\n\n\n\nreturn [ msg ];\n","outputs":"1","noerr":0,"initialize":"","finalize":"","libs":[],"x":350,"y":800,"wires":[["f9be35a6.34dfc8"]]},{"id":"f9be35a6.34dfc8","type":"telegram sender","z":"d2a7149.d2ba6e8","name":"","bot":"16f24810.a6a6f8","haserroroutput":false,"outputs":1,"x":630,"y":800,"wires":[[]]},{"id":"8edee02a.ad9d4","type":"telegram command","z":"d2a7149.d2ba6e8","name":"значения датчиков","command":"что значат показания","bot":"16f24810.a6a6f8","strict":false,"hasresponse":true,"useregex":false,"removeregexcommand":false,"outputs":2,"x":130,"y":840,"wires":[["cc38612c.adeab"],[]]},{"id":"7e0a0993.c9cc68","type":"telegram command","z":"d2a7149.d2ba6e8","name":"/func","command":"/func","bot":"16f24810.a6a6f8","strict":false,"hasresponse":true,"useregex":false,"removeregexcommand":false,"outputs":2,"x":110,"y":640,"wires":[["b10ceff1.bbcde"],[]]}]
+[
+    {
+        "id": "d2a7149.d2ba6e8",
+        "type": "tab",
+        "label": "main",
+        "disabled": false,
+        "info": ""
+    },
+    {
+        "id": "cd3e5352.717538",
+        "type": "debug",
+        "z": "d2a7149.d2ba6e8",
+        "name": "Debug",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 250,
+        "y": 140,
+        "wires": []
+    },
+    {
+        "id": "db28aeae.a44ba8",
+        "type": "function",
+        "z": "d2a7149.d2ba6e8",
+        "name": "hello message",
+        "func": "context.global.AllId = [];\ncontext.global.keyboard = { pending : true };\n\n\nvar opts = {\n  reply_to_message_id: msg.payload.messageId,\n  reply_markup: JSON.stringify({\n    keyboard: [\n      ['Функции'],['Показатели'],['/help']],\n      'resize_keyboard' : true, \n      'one_time_keyboard' : true\n  })\n};\n\n\nmsg.payload.content = (\"Приветсвуем Вас и благодарим за приобретение и\" +\n\" использование нашего оборудования!\" );\nmsg.payload.options = opts;\n\nif (context.global.AllId.includes(msg.payload.chatId) == false) {\n    context.global.AllId.push(msg.payload.chatId);\n}\n\nreturn [ msg ];\n",
+        "outputs": "1",
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 280,
+        "y": 180,
+        "wires": [
+            [
+                "b42fe1e0.7bc34"
+            ]
+        ]
+    },
+    {
+        "id": "cc400aac.97c5f8",
+        "type": "telegram command",
+        "z": "d2a7149.d2ba6e8",
+        "name": "Старт",
+        "command": "/start",
+        "bot": "16f24810.a6a6f8",
+        "strict": false,
+        "hasresponse": true,
+        "useregex": false,
+        "removeregexcommand": false,
+        "outputs": 2,
+        "x": 80,
+        "y": 200,
+        "wires": [
+            [
+                "db28aeae.a44ba8",
+                "cd3e5352.717538"
+            ],
+            []
+        ]
+    },
+    {
+        "id": "e4c03988.e0f2b8",
+        "type": "function",
+        "z": "d2a7149.d2ba6e8",
+        "d": true,
+        "name": "copy",
+        "func": "msg.payload.copy = { chatId : -292227168 };\n\nmsg.payload.copy.options = {\n    disable_notification : true\n};\n\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 510,
+        "y": 1560,
+        "wires": [
+            [
+                "f3c0cd9c.e5a4e"
+            ]
+        ]
+    },
+    {
+        "id": "f3c0cd9c.e5a4e",
+        "type": "telegram sender",
+        "z": "d2a7149.d2ba6e8",
+        "d": true,
+        "name": "",
+        "bot": "16f24810.a6a6f8",
+        "haserroroutput": false,
+        "outputs": 1,
+        "x": 740,
+        "y": 1560,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "db682798.f64838",
+        "type": "telegram command",
+        "z": "d2a7149.d2ba6e8",
+        "d": true,
+        "name": "",
+        "command": "Старт",
+        "bot": "16f24810.a6a6f8",
+        "strict": false,
+        "hasresponse": true,
+        "useregex": false,
+        "removeregexcommand": false,
+        "outputs": 2,
+        "x": 290,
+        "y": 1560,
+        "wires": [
+            [],
+            [
+                "e4c03988.e0f2b8"
+            ]
+        ]
+    },
+    {
+        "id": "988b120b.d94a8",
+        "type": "mqtt in",
+        "z": "d2a7149.d2ba6e8",
+        "name": "",
+        "topic": "safetyDacha/Device_1",
+        "qos": "0",
+        "datatype": "auto",
+        "broker": "51f2e3df.4696bc",
+        "nl": false,
+        "rap": true,
+        "rh": 0,
+        "x": 560,
+        "y": 200,
+        "wires": [
+            [
+                "85aa2bc2.c0c048",
+                "80cca428.885548"
+            ]
+        ]
+    },
+    {
+        "id": "85aa2bc2.c0c048",
+        "type": "function",
+        "z": "d2a7149.d2ba6e8",
+        "name": "separate data",
+        "func": "let device_data = msg.payload;\nconst indicators = device_data.split(\"  \");\nlet temp = indicators [2];\nlet hum = indicators [4];\nlet pres = indicators [6];\nlet water = indicators [8];\n\ncontext.global.sensors_data = {\n    hum: hum,\n    temp: temp,\n    pres: pres,\n    water: water\n}\n\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 820,
+        "y": 160,
+        "wires": [
+            [
+                "9c598236.e9cb4",
+                "e4e943b3.44507",
+                "45becda9.a872b4"
+            ]
+        ]
+    },
+    {
+        "id": "eb6e8a87.a188b8",
+        "type": "telegram command",
+        "z": "d2a7149.d2ba6e8",
+        "name": "Показатели",
+        "command": "Показатели",
+        "bot": "16f24810.a6a6f8",
+        "strict": false,
+        "hasresponse": true,
+        "useregex": false,
+        "removeregexcommand": false,
+        "outputs": 2,
+        "x": 870,
+        "y": 360,
+        "wires": [
+            [
+                "e7230c6.227cff"
+            ],
+            []
+        ]
+    },
+    {
+        "id": "7c75c797.ffbb78",
+        "type": "telegram sender",
+        "z": "d2a7149.d2ba6e8",
+        "name": "send indecators",
+        "bot": "16f24810.a6a6f8",
+        "haserroroutput": false,
+        "outputs": 1,
+        "x": 1320,
+        "y": 340,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "e7230c6.227cff",
+        "type": "function",
+        "z": "d2a7149.d2ba6e8",
+        "name": "send collected data",
+        "func": "context.global.keyboard = { pending : true };\n\n\nvar opts = {\n  reply_to_message_id: msg.payload.messageId,\n  reply_markup: JSON.stringify({\n    keyboard: [\n      ['Функции'],['Показатели'],['/help']],\n //     ['No']],\n      'resize_keyboard' : true, \n      'one_time_keyboard' : true\n  })\n};\n\n\nindicators = msg.payload;\nlet sending_data = (\n    \"Последние показатели\\n\" +\n    \"Температура: \" + context.global.sensors_data.temp + \"\\n\" +\n    \"Влажность: \" + context.global.sensors_data.hum + \"\\n\" +\n    \"Давление: \" + context.global.sensors_data.pres + \"\\n\"\n    )\n\nmsg.payload = \n{\n    chatId : msg.payload.chatId,\n    type : \"message\",\n    content : sending_data,\n    options: opts\n};\n\nreturn [msg];",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1090,
+        "y": 360,
+        "wires": [
+            [
+                "7c75c797.ffbb78"
+            ]
+        ]
+    },
+    {
+        "id": "7bf5e4e9.495b74",
+        "type": "telegram sender",
+        "z": "d2a7149.d2ba6e8",
+        "d": true,
+        "name": "",
+        "bot": "233d0697.0c2c6a",
+        "haserroroutput": false,
+        "outputs": 1,
+        "x": 530,
+        "y": 1520,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "a35c4e19.9ed248",
+        "type": "function",
+        "z": "d2a7149.d2ba6e8",
+        "d": true,
+        "name": "contact",
+        "func": "msg.payload =\n{\n    chatId : 312796713,\n    type : \"contact\",\n    content :\n    {\n        phone_number: \"+49 30 987654321\",\n        first_name: \"Max\",\n        last_name: \"Mustermann\"\n    },\n    options :\n    {\n        disable_notification : true\n    }\n}\n\nreturn msg;\n",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 339.66669845581055,
+        "y": 1520.3333539962769,
+        "wires": [
+            [
+                "7bf5e4e9.495b74"
+            ]
+        ]
+    },
+    {
+        "id": "b9f0a60f.c5efb8",
+        "type": "inject",
+        "z": "d2a7149.d2ba6e8",
+        "d": true,
+        "name": "",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": "",
+        "topic": "",
+        "payload": "",
+        "payloadType": "str",
+        "x": 161.66668701171875,
+        "y": 1519.6667280197144,
+        "wires": [
+            [
+                "a35c4e19.9ed248"
+            ]
+        ]
+    },
+    {
+        "id": "edcf10da.82f94",
+        "type": "telegram sender",
+        "z": "d2a7149.d2ba6e8",
+        "d": true,
+        "name": "send initial message",
+        "bot": "16f24810.a6a6f8",
+        "haserroroutput": false,
+        "outputs": 1,
+        "x": 540,
+        "y": 1440,
+        "wires": [
+            [
+                "db8e5a96.69f8f8"
+            ]
+        ]
+    },
+    {
+        "id": "d338f266.95ff8",
+        "type": "function",
+        "z": "d2a7149.d2ba6e8",
+        "d": true,
+        "name": "original message",
+        "func": "msg.payload.type = 'message'\nmsg.payload.content = 'The original message';\nreturn [ msg ];\n",
+        "outputs": "1",
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 238.99982452392578,
+        "y": 1440.9999179840088,
+        "wires": [
+            [
+                "edcf10da.82f94"
+            ]
+        ]
+    },
+    {
+        "id": "8c682765.b34cf8",
+        "type": "telegram command",
+        "z": "d2a7149.d2ba6e8",
+        "d": true,
+        "name": "/foo",
+        "command": "/foo",
+        "bot": "16f24810.a6a6f8",
+        "strict": false,
+        "hasresponse": false,
+        "useregex": false,
+        "removeregexcommand": false,
+        "outputs": 1,
+        "x": 59.99989318847656,
+        "y": 1446.9998998641968,
+        "wires": [
+            [
+                "d338f266.95ff8"
+            ]
+        ]
+    },
+    {
+        "id": "ad64ec3d.4d2b4",
+        "type": "telegram sender",
+        "z": "d2a7149.d2ba6e8",
+        "d": true,
+        "name": "",
+        "bot": "16f24810.a6a6f8",
+        "haserroroutput": false,
+        "outputs": 1,
+        "x": 587.2405776977539,
+        "y": 1646.696689605713,
+        "wires": [
+            [
+                "3499a9a6.8ae146"
+            ]
+        ]
+    },
+    {
+        "id": "3dc83d60.7cbcc2",
+        "type": "function",
+        "z": "d2a7149.d2ba6e8",
+        "d": true,
+        "name": "modified message",
+        "func": "var messageId = context.global.messageId;\nvar chatId = context.global.chatId;\n\nvar options = {\n    chat_id : chatId,\n    message_id : messageId\n};\n\nmsg.payload = {\n    type : 'editMessageText',\n    content : \"jopa\",\n    options : options,\n}\n\nreturn [ msg ];\n",
+        "outputs": "1",
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 307.2405776977539,
+        "y": 1646.696689605713,
+        "wires": [
+            [
+                "ad64ec3d.4d2b4"
+            ]
+        ]
+    },
+    {
+        "id": "db8e5a96.69f8f8",
+        "type": "function",
+        "z": "d2a7149.d2ba6e8",
+        "d": true,
+        "name": "save IDs",
+        "func": "// We store the messageId to be able to edit this reply in the callback query. \ncontext.global.messageId = msg.payload.sentMessageId;\ncontext.global.chatId = msg.payload.chatId;\nreturn [ msg ];\n",
+        "outputs": "1",
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 737.9073638916016,
+        "y": 1440.3634023666382,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "3499a9a6.8ae146",
+        "type": "debug",
+        "z": "d2a7149.d2ba6e8",
+        "d": true,
+        "name": "",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 810,
+        "y": 1660,
+        "wires": []
+    },
+    {
+        "id": "b55fa9d6.a7e438",
+        "type": "inject",
+        "z": "d2a7149.d2ba6e8",
+        "d": true,
+        "name": "",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "jopa",
+        "payloadType": "str",
+        "x": 110,
+        "y": 1660,
+        "wires": [
+            [
+                "3dc83d60.7cbcc2"
+            ]
+        ]
+    },
+    {
+        "id": "b42fe1e0.7bc34",
+        "type": "telegram sender",
+        "z": "d2a7149.d2ba6e8",
+        "name": "",
+        "bot": "16f24810.a6a6f8",
+        "haserroroutput": false,
+        "outputs": 1,
+        "x": 150,
+        "y": 320,
+        "wires": [
+            [
+                "6a403314.20458c"
+            ]
+        ]
+    },
+    {
+        "id": "55ced553.2af13c",
+        "type": "debug",
+        "z": "d2a7149.d2ba6e8",
+        "name": "",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 1510,
+        "y": 280,
+        "wires": []
+    },
+    {
+        "id": "80cca428.885548",
+        "type": "debug",
+        "z": "d2a7149.d2ba6e8",
+        "name": "",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "false",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 630,
+        "y": 80,
+        "wires": []
+    },
+    {
+        "id": "d5cabb97.cb6ef8",
+        "type": "function",
+        "z": "d2a7149.d2ba6e8",
+        "d": true,
+        "name": "alert_temp_old",
+        "func": "context.global.alert_temp_qty;\n\nvar temp = (context.global.sensors_data.temp);\n\nif (temp >= 25)  {\n    context.global.alert_temp_qty += 1;\n}\n\nlet alert_temp_msg = (\"Внимание! Температура на датчике \" + temp + \" C! Есть вероятность возгарания.\");\n\n\nif (context.global.alert_temp_qty >= 3) {\n    //let alert_temp_msg = (\"Внимание! Температура на датчике \" + temp + \" C! Есть вероятность возгарания.\");\n    msg.payload = {\n        chatId : context.global.AllId, /*msg.payload.chatId*/\n        type : \"message\",\n        content : alert_temp_msg\n    \n   };\n   context.global.alert_temp_qty = 0;\n}\n\n\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1260,
+        "y": 1480,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "87807b05.f16228",
+        "type": "telegram sender",
+        "z": "d2a7149.d2ba6e8",
+        "name": "send alert",
+        "bot": "16f24810.a6a6f8",
+        "haserroroutput": false,
+        "outputs": 1,
+        "x": 1320,
+        "y": 40,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "6a403314.20458c",
+        "type": "function",
+        "z": "d2a7149.d2ba6e8",
+        "name": "help message",
+        "func": "context.global.keyboard = { pending : true };\n\n\nvar opts = {\n//  reply_to_message_id: msg.payload.messageId,\n  reply_markup: JSON.stringify({\n    keyboard: [\n     ['Функции'],['Показатели'],['/help']],\n //     ['No']],\n      'resize_keyboard' : true, \n      'one_time_keyboard' : true\n  })\n};\n\nlet help_msg = (\"Бот SafetyDacha позволяет вам следить за показателями \" + \n\" температуры, влажности, атмосферного давления и затопления на вашем\" + \n\" участке.\" +\n\"\\nКоманды бота: \\n /help - вывести данное сообщение с информацией\" + \n\" о командах и функциях бота \\n \" +\n\"/info - ❗️❗️❗️РЕКОМЕНДУЕТСЯ К ИЗУЧЕНИЮ   вывести информацию о значени\"+\n\"ях параметров датчиков\"+\n\"\\n/func или Функции - отобразить доступные функции\"+\n\"\\n/sensors или Показатели - вывести последние данные с датчиков \\n\"\n);\n\n\nmsg.payload.content = help_msg;\nmsg.payload.options = opts;\n\n\n\nreturn [ msg ];\n",
+        "outputs": "1",
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 340,
+        "y": 420,
+        "wires": [
+            [
+                "11f5534b.5696bd"
+            ]
+        ]
+    },
+    {
+        "id": "8e0101d9.83c59",
+        "type": "telegram command",
+        "z": "d2a7149.d2ba6e8",
+        "name": "Помощь",
+        "command": "Помощь",
+        "bot": "16f24810.a6a6f8",
+        "strict": false,
+        "hasresponse": true,
+        "useregex": false,
+        "removeregexcommand": false,
+        "outputs": 2,
+        "x": 120,
+        "y": 420,
+        "wires": [
+            [
+                "6a403314.20458c"
+            ],
+            []
+        ]
+    },
+    {
+        "id": "1c78df93.65b46",
+        "type": "debug",
+        "z": "d2a7149.d2ba6e8",
+        "name": "",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 350,
+        "y": 40,
+        "wires": []
+    },
+    {
+        "id": "11f5534b.5696bd",
+        "type": "telegram sender",
+        "z": "d2a7149.d2ba6e8",
+        "name": "",
+        "bot": "16f24810.a6a6f8",
+        "haserroroutput": false,
+        "outputs": 1,
+        "x": 610,
+        "y": 420,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "890e9f78.9439c",
+        "type": "telegram command",
+        "z": "d2a7149.d2ba6e8",
+        "name": "/help",
+        "command": "/help",
+        "bot": "16f24810.a6a6f8",
+        "strict": false,
+        "hasresponse": true,
+        "useregex": false,
+        "removeregexcommand": false,
+        "outputs": 2,
+        "x": 110,
+        "y": 480,
+        "wires": [
+            [
+                "6a403314.20458c"
+            ],
+            []
+        ]
+    },
+    {
+        "id": "9c598236.e9cb4",
+        "type": "function",
+        "z": "d2a7149.d2ba6e8",
+        "name": "alert_water",
+        "func": "if (context.global.water_noti == 1) {\nvar wat_qty = global.get(\"wat_qty\") || 0;\n\nvar wat = (context.global.sensors_data.water);\n\nif (wat == 1)  {\n    wat_qty += 1;\n    global.set('wat_qty',wat_qty);\n}\n\nlet alert_water_msg = (\"Внимание! Сработал датчик протечки.\"+\n\"Отключить уведомления на 1 час: /water_noti_off\");\n\n\nif (wat_qty >= 3) {\n    //let alert_temp_msg = (\"Внимание! Температура на датчике \" + temp + \" C! Есть вероятность возгарания.\");\n    msg.payload = {\n        chatId : context.global.AllId, /*msg.payload.chatId*/\n        type : \"message\",\n        content : alert_water_msg\n    \n   };\n  \n   wat_qty = 0;\n   global.set('wat_qty',wat_qty);\n}\n}\n\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "// Добавленный здесь код будет исполняться\n// однократно при развертывании узла.\ncontext.global.water_noti = 1;\nwat_qty = 0;\n   global.set('wat_qty',wat_qty);",
+        "finalize": "",
+        "libs": [],
+        "x": 1090,
+        "y": 120,
+        "wires": [
+            [
+                "30a96dfe.4f9c72"
+            ]
+        ]
+    },
+    {
+        "id": "30a96dfe.4f9c72",
+        "type": "telegram sender",
+        "z": "d2a7149.d2ba6e8",
+        "name": "send alert",
+        "bot": "16f24810.a6a6f8",
+        "haserroroutput": false,
+        "outputs": 1,
+        "x": 1320,
+        "y": 100,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "cd7d6e42.1e766",
+        "type": "telegram sender",
+        "z": "d2a7149.d2ba6e8",
+        "name": "send alert",
+        "bot": "16f24810.a6a6f8",
+        "haserroroutput": false,
+        "outputs": 1,
+        "x": 1320,
+        "y": 160,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "e4e943b3.44507",
+        "type": "function",
+        "z": "d2a7149.d2ba6e8",
+        "name": "alert_hum",
+        "func": "if (context.global.hum_noti == 1) {\n    var hum_qty = global.get(\"hum_qty\") || 0;\n    \n    var hum = (context.global.sensors_data.hum);\n    \n    if (hum >= 65)  {\n        hum_qty += 1;\n        global.set('hum_qty',hum_qty);\n    }\n    \n    let alert_hum_msg = (\"Внимание! Влажность превышает \" + hum + \n    \"%! Это может привести к порче имущества. \\n Больше информации: /info\" +\n    \"\\n Отключить уведомления на 1 час: /hum_noti_off\");\n    \n    \n    if (hum_qty >= 3) {\n        //let alert_temp_msg = (\"Внимание! Температура на датчике \" + temp + \" C! Есть вероятность возгарания.\");\n        msg.payload = {\n            chatId : context.global.AllId, /*msg.payload.chatId*/\n            type : \"message\",\n            content : alert_hum_msg\n        \n       };\n      \n       hum_qty = 0;\n       global.set('hum_qty',hum_qty);\n    }\n}\n\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "// Добавленный здесь код будет исполняться\n// однократно при развертывании узла.\ncontext.global.hum_noti = 1;\nhum_qty = 0;\n       global.set('hum_qty',hum_qty);",
+        "finalize": "",
+        "libs": [],
+        "x": 1080,
+        "y": 180,
+        "wires": [
+            [
+                "cd7d6e42.1e766"
+            ]
+        ]
+    },
+    {
+        "id": "2ccd8e60.4b48d2",
+        "type": "function",
+        "z": "d2a7149.d2ba6e8",
+        "d": true,
+        "name": "alert_temp",
+        "func": "var count = global.get(\"count\") || 0;\n\nvar temp = (context.global.sensors_data.temp);\n\nif (temp >= 47)  {\n    count += 1;\n    global.set('count',count);\n}\n\nlet alert_temp_msg = (\"Внимание! Температура на датчике \" + temp + \" C! Есть вероятность возгарания.\");\n\n\nif (count >= 3) {\n    //let alert_temp_msg = (\"Внимание! Температура на датчике \" + temp + \" C! Есть вероятность возгарания.\");\n    msg.payload = {\n        chatId : context.global.AllId, /*msg.payload.chatId*/\n        type : \"message\",\n        content : alert_temp_msg\n    \n   };\n  \n   count = 0;\n   global.set('count',count);\n}\n\n\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1210,
+        "y": 1440,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "45becda9.a872b4",
+        "type": "function",
+        "z": "d2a7149.d2ba6e8",
+        "name": "alert_temp_test",
+        "func": "if (context.global.temp_noti == 1) {\n    var count_test = global.get(\"count_test\") || 0;\n    \n    var temp = (context.global.sensors_data.temp);\n    \n    if (temp >= 47)  {\n        count_test += 1;\n        global.set('count_test',count_test);\n    }\n    \n    let alert_temp_msg = (\"Внимание! Температура на датчике \" + temp + \n    \" °C! Есть вероятность возгарания. Отключить уведомления на 1 час: /temp_noti_off\" );\n    \n    \n    if (count_test >= 3) {\n        //let alert_temp_msg = (\"Внимание! Температура на датчике \" + temp + \" C! Есть вероятность возгарания.\");\n        msg.payload = {\n            chatId : context.global.AllId, /*msg.payload.chatId*/\n            type : \"message\",\n            content : alert_temp_msg\n        \n       };\n      \n       count_test = 0;\n       global.set('count_test',count_test);\n    }\n\n}\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "// Добавленный здесь код будет исполняться\n// однократно при развертывании узла.\ncontext.global.temp_noti = 1;\ncount_test = 0;\n       global.set('count_test',count_test);",
+        "finalize": "",
+        "libs": [],
+        "x": 1100,
+        "y": 60,
+        "wires": [
+            [
+                "87807b05.f16228"
+            ]
+        ]
+    },
+    {
+        "id": "ad184dca.0e9fc",
+        "type": "function",
+        "z": "d2a7149.d2ba6e8",
+        "name": "enter_device_id message",
+        "func": "context.global.keyboard = { pending : true };\n\n\nvar opts = {\n//  reply_to_message_id: msg.payload.messageId,\n  reply_markup: JSON.stringify({\n    keyboard: [\n      ['Функции'],['Показатели'],['/help']],\n //     ['No']],\n      'resize_keyboard' : true, \n      'one_time_keyboard' : true\n  })\n};\n\n\nmsg.payload.content = ('Уведомления о температуре отключены на 1 час ');\nmsg.payload.options = opts;\ncontext.global.temp_noti = 0;\n\n\nreturn [ msg ];\n",
+        "outputs": "1",
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1170,
+        "y": 620,
+        "wires": [
+            [
+                "933c2bb0.a04458",
+                "80efbc6.45b5d4"
+            ]
+        ]
+    },
+    {
+        "id": "e63d8394.8965a",
+        "type": "telegram command",
+        "z": "d2a7149.d2ba6e8",
+        "name": "Отключить уведомления о температуре",
+        "command": "/temp_noti_off",
+        "bot": "16f24810.a6a6f8",
+        "strict": false,
+        "hasresponse": true,
+        "useregex": false,
+        "removeregexcommand": false,
+        "outputs": 2,
+        "x": 960,
+        "y": 540,
+        "wires": [
+            [
+                "ad184dca.0e9fc"
+            ],
+            []
+        ]
+    },
+    {
+        "id": "933c2bb0.a04458",
+        "type": "telegram sender",
+        "z": "d2a7149.d2ba6e8",
+        "name": "",
+        "bot": "16f24810.a6a6f8",
+        "haserroroutput": false,
+        "outputs": 1,
+        "x": 1350,
+        "y": 480,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "80efbc6.45b5d4",
+        "type": "delay",
+        "z": "d2a7149.d2ba6e8",
+        "name": "",
+        "pauseType": "delay",
+        "timeout": "1",
+        "timeoutUnits": "hours",
+        "rate": "1",
+        "nbRateUnits": "1",
+        "rateUnits": "second",
+        "randomFirst": "1",
+        "randomLast": "5",
+        "randomUnits": "seconds",
+        "drop": false,
+        "x": 1390,
+        "y": 620,
+        "wires": [
+            [
+                "41394cae.08f994"
+            ]
+        ]
+    },
+    {
+        "id": "41394cae.08f994",
+        "type": "function",
+        "z": "d2a7149.d2ba6e8",
+        "name": "enter_device_id message",
+        "func": "context.global.keyboard = { pending : true };\n\n\nvar opts = {\n//  reply_to_message_id: msg.payload.messageId,\n  reply_markup: JSON.stringify({\n    keyboard: [\n      ['Функции'],['Показатели'],['/help']],\n //     ['No']],\n      'resize_keyboard' : true, \n      'one_time_keyboard' : true\n  })\n};\n\n\nmsg.payload.content = ('Уведомления о температуре возобновлены ');\nmsg.payload.options = opts;\ncontext.global.temp_noti = 1;\n\n\nreturn [ msg ];\n",
+        "outputs": "1",
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1610,
+        "y": 620,
+        "wires": [
+            [
+                "abf71ee1.f4846"
+            ]
+        ]
+    },
+    {
+        "id": "abf71ee1.f4846",
+        "type": "telegram sender",
+        "z": "d2a7149.d2ba6e8",
+        "name": "",
+        "bot": "16f24810.a6a6f8",
+        "haserroroutput": false,
+        "outputs": 1,
+        "x": 1770,
+        "y": 480,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "d4656358.cf90a",
+        "type": "function",
+        "z": "d2a7149.d2ba6e8",
+        "name": "enter_device_id message",
+        "func": "context.global.keyboard = { pending : true };\n\n\nvar opts = {\n//  reply_to_message_id: msg.payload.messageId,\n  reply_markup: JSON.stringify({\n    keyboard: [\n     ['Функции'],['Показатели'],['/help']],\n //     ['No']],\n      'resize_keyboard' : true, \n      'one_time_keyboard' : true\n  })\n};\n\n\nmsg.payload.content = ('Уведомления о протечке отключены на 1 час ');\nmsg.payload.options = opts;\ncontext.global.water_noti = 0;\n\n\nreturn [ msg ];\n",
+        "outputs": "1",
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1170,
+        "y": 860,
+        "wires": [
+            [
+                "2645c1ff.7a022e",
+                "21ea8816.9d78c8"
+            ]
+        ]
+    },
+    {
+        "id": "d70edd6.8a17d2",
+        "type": "telegram command",
+        "z": "d2a7149.d2ba6e8",
+        "name": "Отключить уведомления датчика протечки",
+        "command": "/water_noti_off",
+        "bot": "16f24810.a6a6f8",
+        "strict": false,
+        "hasresponse": true,
+        "useregex": false,
+        "removeregexcommand": false,
+        "outputs": 2,
+        "x": 970,
+        "y": 780,
+        "wires": [
+            [
+                "d4656358.cf90a"
+            ],
+            []
+        ]
+    },
+    {
+        "id": "2645c1ff.7a022e",
+        "type": "telegram sender",
+        "z": "d2a7149.d2ba6e8",
+        "name": "",
+        "bot": "16f24810.a6a6f8",
+        "haserroroutput": false,
+        "outputs": 1,
+        "x": 1350,
+        "y": 720,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "21ea8816.9d78c8",
+        "type": "delay",
+        "z": "d2a7149.d2ba6e8",
+        "name": "",
+        "pauseType": "delay",
+        "timeout": "1",
+        "timeoutUnits": "hours",
+        "rate": "1",
+        "nbRateUnits": "1",
+        "rateUnits": "second",
+        "randomFirst": "1",
+        "randomLast": "5",
+        "randomUnits": "seconds",
+        "drop": false,
+        "x": 1390,
+        "y": 860,
+        "wires": [
+            [
+                "2f594452.bcc37c"
+            ]
+        ]
+    },
+    {
+        "id": "2f594452.bcc37c",
+        "type": "function",
+        "z": "d2a7149.d2ba6e8",
+        "name": "enter_device_id message",
+        "func": "context.global.keyboard = { pending : true };\n\n\nvar opts = {\n//  reply_to_message_id: msg.payload.messageId,\n  reply_markup: JSON.stringify({\n    keyboard: [\n      ['Функции'],['Показатели'],['/help']],\n //     ['No']],\n      'resize_keyboard' : true, \n      'one_time_keyboard' : true\n  })\n};\n\n\nmsg.payload.content = ('Уведомления о протечке возобновлены ');\nmsg.payload.options = opts;\ncontext.global.water_noti = 1;\n\n\nreturn [ msg ];\n",
+        "outputs": "1",
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1610,
+        "y": 860,
+        "wires": [
+            [
+                "e8dd19cc.f4c898"
+            ]
+        ]
+    },
+    {
+        "id": "e8dd19cc.f4c898",
+        "type": "telegram sender",
+        "z": "d2a7149.d2ba6e8",
+        "name": "",
+        "bot": "16f24810.a6a6f8",
+        "haserroroutput": false,
+        "outputs": 1,
+        "x": 1770,
+        "y": 720,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "15ab2549.0fbbab",
+        "type": "function",
+        "z": "d2a7149.d2ba6e8",
+        "name": "enter_device_id message",
+        "func": "context.global.keyboard = { pending : true };\n\n\nvar opts = {\n//  reply_to_message_id: msg.payload.messageId,\n  reply_markup: JSON.stringify({\n    keyboard: [\n      ['Функции'],['Показатели'],['/help']],\n //     ['No']],\n      'resize_keyboard' : true, \n      'one_time_keyboard' : true\n  })\n};\n\n\nmsg.payload.content = ('Уведомления о влажности отключены на 1 час ');\nmsg.payload.options = opts;\ncontext.global.hum_noti = 0;\n\n\nreturn [ msg ];\n",
+        "outputs": "1",
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1210,
+        "y": 1060,
+        "wires": [
+            [
+                "7caefe24.0221b",
+                "d5f33fa3.f8992"
+            ]
+        ]
+    },
+    {
+        "id": "78ba85a6.d270bc",
+        "type": "telegram command",
+        "z": "d2a7149.d2ba6e8",
+        "name": "Отключить уведомления о влажности",
+        "command": "/hum_noti_off",
+        "bot": "16f24810.a6a6f8",
+        "strict": false,
+        "hasresponse": true,
+        "useregex": false,
+        "removeregexcommand": false,
+        "outputs": 2,
+        "x": 990,
+        "y": 980,
+        "wires": [
+            [
+                "15ab2549.0fbbab"
+            ],
+            []
+        ]
+    },
+    {
+        "id": "7caefe24.0221b",
+        "type": "telegram sender",
+        "z": "d2a7149.d2ba6e8",
+        "name": "",
+        "bot": "16f24810.a6a6f8",
+        "haserroroutput": false,
+        "outputs": 1,
+        "x": 1390,
+        "y": 920,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "d5f33fa3.f8992",
+        "type": "delay",
+        "z": "d2a7149.d2ba6e8",
+        "name": "",
+        "pauseType": "delay",
+        "timeout": "1",
+        "timeoutUnits": "hours",
+        "rate": "1",
+        "nbRateUnits": "1",
+        "rateUnits": "second",
+        "randomFirst": "1",
+        "randomLast": "5",
+        "randomUnits": "seconds",
+        "drop": false,
+        "x": 1430,
+        "y": 1060,
+        "wires": [
+            [
+                "8a2d1a47.56f198"
+            ]
+        ]
+    },
+    {
+        "id": "8a2d1a47.56f198",
+        "type": "function",
+        "z": "d2a7149.d2ba6e8",
+        "name": "enter_device_id message",
+        "func": "context.global.keyboard = { pending : true };\n\n\nvar opts = {\n//  reply_to_message_id: msg.payload.messageId,\n  reply_markup: JSON.stringify({\n    keyboard: [\n     ['Функции'],['Показатели'],['/help']],\n //     ['No']],\n      'resize_keyboard' : true, \n      'one_time_keyboard' : true\n  })\n};\n\n\nmsg.payload.content = ('Уведомления о влажности возобновлены');\nmsg.payload.options = opts;\ncontext.global.hum_noti = 1;\n\n\nreturn [ msg ];\n",
+        "outputs": "1",
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1710,
+        "y": 1040,
+        "wires": [
+            [
+                "4cdd6a26.b9e2a4"
+            ]
+        ]
+    },
+    {
+        "id": "4cdd6a26.b9e2a4",
+        "type": "telegram sender",
+        "z": "d2a7149.d2ba6e8",
+        "name": "",
+        "bot": "16f24810.a6a6f8",
+        "haserroroutput": false,
+        "outputs": 1,
+        "x": 1970,
+        "y": 940,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "f70a13c1.b316c",
+        "type": "telegram command",
+        "z": "d2a7149.d2ba6e8",
+        "name": "/sensors",
+        "command": "/sensors",
+        "bot": "16f24810.a6a6f8",
+        "strict": false,
+        "hasresponse": true,
+        "useregex": false,
+        "removeregexcommand": false,
+        "outputs": 2,
+        "x": 880,
+        "y": 420,
+        "wires": [
+            [
+                "e7230c6.227cff"
+            ],
+            []
+        ]
+    },
+    {
+        "id": "3b5d4351.6bf68c",
+        "type": "telegram command",
+        "z": "d2a7149.d2ba6e8",
+        "name": "Включить уведомления о протечке",
+        "command": "/water_noti_on",
+        "bot": "16f24810.a6a6f8",
+        "strict": false,
+        "hasresponse": true,
+        "useregex": false,
+        "removeregexcommand": false,
+        "outputs": 2,
+        "x": 1480,
+        "y": 800,
+        "wires": [
+            [
+                "2f594452.bcc37c"
+            ],
+            []
+        ]
+    },
+    {
+        "id": "be78d3f8.d55e7",
+        "type": "telegram command",
+        "z": "d2a7149.d2ba6e8",
+        "name": "Включить уведомления о температуре",
+        "command": "/temp_noti_on",
+        "bot": "16f24810.a6a6f8",
+        "strict": false,
+        "hasresponse": true,
+        "useregex": false,
+        "removeregexcommand": false,
+        "outputs": 2,
+        "x": 1500,
+        "y": 560,
+        "wires": [
+            [
+                "41394cae.08f994"
+            ],
+            []
+        ]
+    },
+    {
+        "id": "af8153cc.d9b1a",
+        "type": "telegram command",
+        "z": "d2a7149.d2ba6e8",
+        "name": "Включить уведомления о влажности",
+        "command": "/hum_noti_on",
+        "bot": "16f24810.a6a6f8",
+        "strict": false,
+        "hasresponse": true,
+        "useregex": false,
+        "removeregexcommand": false,
+        "outputs": 2,
+        "x": 1530,
+        "y": 980,
+        "wires": [
+            [
+                "8a2d1a47.56f198"
+            ],
+            []
+        ]
+    },
+    {
+        "id": "db588156.f1bd2",
+        "type": "telegram receiver",
+        "z": "d2a7149.d2ba6e8",
+        "name": "",
+        "bot": "16f24810.a6a6f8",
+        "saveDataDir": "",
+        "filterCommands": false,
+        "x": 140,
+        "y": 80,
+        "wires": [
+            [
+                "1c78df93.65b46"
+            ],
+            []
+        ]
+    },
+    {
+        "id": "b10ceff1.bbcde",
+        "type": "function",
+        "z": "d2a7149.d2ba6e8",
+        "name": "func message",
+        "func": "context.global.keyboard = { pending : true };\n\n\nvar opts = {\n//  reply_to_message_id: msg.payload.messageId,\n  reply_markup: JSON.stringify({\n   keyboard: [\n      ['Функции'],['Показатели'],['/help']],\n //     ['No']],\n      'resize_keyboard' : true, \n      'one_time_keyboard' : true\n  })\n};\n\n\nmsg.payload.content = (\"Функции:\\n\\n/sensors - вывести последние\"+\n\" данные с датчиков\"+\n\"\\n/help - вывести сообщение с информацией о командах и функциях бота\"+\n\"\\n/info - ❗️❗️❗️РЕКОМЕНДУЕТСЯ К ИЗУЧЕНИЮ   вывести данное\"+\n\"сообщение с информацией о значени\"+\n\"ях параметров датчиков\"+\n\"\\n\\n ✉️Уведомления о показателях✉️\"+\n\"\\n\\nУведомления о температуре:\"+\n\"\\n/temp_noti_off - Отключить уведомления о температуре на 1 час\"+\n\"\\n/temp_noti_on - Возобновить уведомления о температуре\"+\n\"\\n\\nУведомления о протечке:\"+\n\"\\n/water_noti_off - Отключить уведомления о протечке на 1 час\"+\n\"\\n/water_noti_on - Возобновить уведомления о протечке\"+\n\"\\n\\nУведомления о влажности:\"+\n\"\\n/hum_noti_off - Отключить уведомления о влажности на 1 час\"+\n\"\\n/hum_noti_on - Возобновить уведомления о влажности\"\n\n);\nmsg.payload.options = opts;\n\n\n\nreturn [ msg ];\n",
+        "outputs": "1",
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 320,
+        "y": 600,
+        "wires": [
+            [
+                "3648db6d.9993c4"
+            ]
+        ]
+    },
+    {
+        "id": "a52d6e6c.6f1a2",
+        "type": "telegram command",
+        "z": "d2a7149.d2ba6e8",
+        "name": "Функции",
+        "command": "Функции",
+        "bot": "16f24810.a6a6f8",
+        "strict": false,
+        "hasresponse": true,
+        "useregex": false,
+        "removeregexcommand": false,
+        "outputs": 2,
+        "x": 120,
+        "y": 580,
+        "wires": [
+            [
+                "b10ceff1.bbcde"
+            ],
+            []
+        ]
+    },
+    {
+        "id": "3648db6d.9993c4",
+        "type": "telegram sender",
+        "z": "d2a7149.d2ba6e8",
+        "name": "",
+        "bot": "16f24810.a6a6f8",
+        "haserroroutput": false,
+        "outputs": 1,
+        "x": 590,
+        "y": 600,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "e6910ee8.cf63d",
+        "type": "telegram command",
+        "z": "d2a7149.d2ba6e8",
+        "name": "/info",
+        "command": "/info",
+        "bot": "16f24810.a6a6f8",
+        "strict": false,
+        "hasresponse": true,
+        "useregex": false,
+        "removeregexcommand": false,
+        "outputs": 2,
+        "x": 170,
+        "y": 780,
+        "wires": [
+            [
+                "cc38612c.adeab"
+            ],
+            []
+        ]
+    },
+    {
+        "id": "cc38612c.adeab",
+        "type": "function",
+        "z": "d2a7149.d2ba6e8",
+        "name": "info message",
+        "func": "context.global.keyboard = { pending : true };\n\n\nvar opts = {\n//  reply_to_message_id: msg.payload.messageId,\n  reply_markup: JSON.stringify({\n    keyboard: [\n      ['Функции'],['Показатели'],['/help']],\n //     ['No']],\n      'resize_keyboard' : true, \n      'one_time_keyboard' : true\n  })\n};\n\nlet info_msg = (\"Расширенная информация об использовании бота SafetyDacha\"+\n\"\\n\\nТемпература\\nУказано значение в градусах цельсия. \" +\n\"При значении больше 45 вам придет уведомление о возможном возгорании\" +\n\"\\n\\nВлажность \\nОтображается в процентах и ее оптимальное значение: \" +\n\"30–45% зимой и 30–60% летом. Если влажность в помещении подниметя \" +\n\"выше 65%, то вы получите соответсвующее уведомление. Это может \" +\n\"означать, что во время осадков внутрь попадает слишком много влаги, \" +\n\"что плохо сказывается на имуществе внутри и на самом строении\" +\n\"\\n\\nДавление \\nОтображает атмосферное давление в миллиметрах \"+\n\"ртутного столба\" + \n\"\\n\\nДатчик протечки\\nПредставляет собой два провода, которые \"+ \n\"кладутся близко к месту вероятного начала затопления. При появлении \" +\n\"в этом месте воды контакты замыкаются и датчик сообщает вам о \" +\n\"возможном затоплении.\" + \n\"\\n\\nКоманды бота: \\n /help - вывести сообщение с информацией\" + \n\" о командах и функциях бота\"+\n\"\\n/info - ❗️❗️❗️РЕКОМЕНДУЕТСЯ К ИЗУЧЕНИЮ   вывести данное\"+\n\"сообщение с информацией о значени\"+\n\"ях параметров датчиков\"+\n\"\\n/func или Функции - отобразить доступные функции\"+\n\"\\n/sensors или Показатели - вывести последние данные с датчиков \\n\"\n\n\n);\n\n\nmsg.payload.content = info_msg;\nmsg.payload.options = opts;\n\n\n\nreturn [ msg ];\n",
+        "outputs": "1",
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 350,
+        "y": 800,
+        "wires": [
+            [
+                "f9be35a6.34dfc8"
+            ]
+        ]
+    },
+    {
+        "id": "f9be35a6.34dfc8",
+        "type": "telegram sender",
+        "z": "d2a7149.d2ba6e8",
+        "name": "",
+        "bot": "16f24810.a6a6f8",
+        "haserroroutput": false,
+        "outputs": 1,
+        "x": 630,
+        "y": 800,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "8edee02a.ad9d4",
+        "type": "telegram command",
+        "z": "d2a7149.d2ba6e8",
+        "name": "значения датчиков",
+        "command": "что значат показания",
+        "bot": "16f24810.a6a6f8",
+        "strict": false,
+        "hasresponse": true,
+        "useregex": false,
+        "removeregexcommand": false,
+        "outputs": 2,
+        "x": 130,
+        "y": 840,
+        "wires": [
+            [
+                "cc38612c.adeab"
+            ],
+            []
+        ]
+    },
+    {
+        "id": "7e0a0993.c9cc68",
+        "type": "telegram command",
+        "z": "d2a7149.d2ba6e8",
+        "name": "/func",
+        "command": "/func",
+        "bot": "16f24810.a6a6f8",
+        "strict": false,
+        "hasresponse": true,
+        "useregex": false,
+        "removeregexcommand": false,
+        "outputs": 2,
+        "x": 110,
+        "y": 640,
+        "wires": [
+            [
+                "b10ceff1.bbcde"
+            ],
+            []
+        ]
+    },
+    {
+        "id": "16f24810.a6a6f8",
+        "type": "telegram bot",
+        "botname": "safetyDacha",
+        "usernames": "",
+        "chatids": "",
+        "baseapiurl": "",
+        "updatemode": "polling",
+        "pollinterval": "300",
+        "usesocks": false,
+        "sockshost": "",
+        "socksport": "6667",
+        "socksusername": "anonymous",
+        "sockspassword": "",
+        "bothost": "",
+        "botpath": "",
+        "localbotport": "8443",
+        "publicbotport": "8443",
+        "privatekey": "",
+        "certificate": "",
+        "useselfsignedcertificate": false,
+        "sslterminated": false,
+        "verboselogging": false
+    },
+    {
+        "id": "51f2e3df.4696bc",
+        "type": "mqtt-broker",
+        "name": "mosquitto_on_google",
+        "broker": "35.198.104.194",
+        "port": "1883",
+        "clientid": "",
+        "usetls": false,
+        "protocolVersion": "4",
+        "keepalive": "60",
+        "cleansession": true,
+        "birthTopic": "",
+        "birthQos": "0",
+        "birthPayload": "",
+        "birthMsg": {},
+        "closeTopic": "",
+        "closeQos": "0",
+        "closePayload": "",
+        "closeMsg": {},
+        "willTopic": "",
+        "willQos": "0",
+        "willPayload": "",
+        "willMsg": {},
+        "sessionExpiry": ""
+    },
+    {
+        "id": "233d0697.0c2c6a",
+        "type": "telegram bot",
+        "botname": "HeinzBot",
+        "usernames": "",
+        "chatids": ""
+    }
+]

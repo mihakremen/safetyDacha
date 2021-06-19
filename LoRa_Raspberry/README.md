@@ -1,4 +1,5 @@
-# This fork - pyLoRa
+#Запускаемый файл программы - mqtt_LORA_SERVER.py
+This fork - pyLoRa  
 This fork is an adaptation and an improved version of the original mayeranalytic work (mayeranalytics/pySX127x)
 pyLoRa can be used to communicate with the Arduino through the RADIOHEAD library, for more information see these examples -> [rpsreal/LoRa_Ra-02_Arduino](https://github.com/rpsreal/LoRa_Ra-02_Arduino). 
 

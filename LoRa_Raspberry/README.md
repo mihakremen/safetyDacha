@@ -1,4 +1,4 @@
-#Запускаемый файл программы - mqtt_LORA_SERVER.py
+# Запускаемый файл программы - mqtt_LORA_SERVER.py  
 This fork - pyLoRa  
 This fork is an adaptation and an improved version of the original mayeranalytic work (mayeranalytics/pySX127x)
 pyLoRa can be used to communicate with the Arduino through the RADIOHEAD library, for more information see these examples -> [rpsreal/LoRa_Ra-02_Arduino](https://github.com/rpsreal/LoRa_Ra-02_Arduino). 
@@ -45,18 +45,18 @@ pip install pycrypto
 Make the connections as shown below.
 If it is necessary to change edit the file board_config.py
 
-| Ra-02 LoRa BOARD1 |  RaspPi GPIO  | Ra-02 LoRa BOARD2 |  RaspPi GPIO  |
-|:------------------|:--------------|:------------------|:-------------:|
-|        MOSI       | GPIO 10       |        MOSI       | GPIO 10       |
-|        MISO       | GPIO 9        |        MISO       | GPIO 9        |
-|     SCK (SCLK)    | GPIO 11       |     SCK (SCLK)    | GPIO 11       |
-|        NSS        | GPIO 8 (CE0)  |        NSS        | GPIO 7 (CE1)  |
-|     DIO0 (IRQ)    | GPIO 4        |     DIO0 (IRQ)    | GPIO 23       |
-|        DIO1       | GPIO 17       |        DIO1       | GPIO 24       |
-|        DIO2       | GPIO 18       |        DIO2       | GPIO 25       |
-|        DIO3       | GPIO 27       |        DIO3       | GPIO 5        |
-|     RST (Reset)   | GPIO 22       |     RST (Reset)   | GPIO 6        |
-|        LED        | GPIO 13       |        LED        | GPIO 19       |
+| rf95   LoRa BOARD |  RaspPi GPIO  |
+|:------------------|:--------------|
+|        MOSI       | GPIO 10       |
+|        MISO       | GPIO 9        |
+|     SCK (SCLK)    | GPIO 11       |
+|        NSS        | GPIO 8 (CE0)  |
+|     DIO0 (IRQ)    | GPIO 4        |
+|        DIO1       | GPIO 17       |
+|        DIO2       | GPIO 18       |
+|        DIO3       | GPIO 27       |
+|     RST (Reset)   | GPIO 22       |
+|        LED        | GPIO 13       |
 
 LED external with 1k ohm or 330ohm (optional)
 

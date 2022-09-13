@@ -1,24 +1,4 @@
 
-/*
-  LoRa Duplex communication with Spreading Factor
-
-  Sends a message every half second, and polls continually
-  for new incoming messages. Sets the LoRa radio's spreading factor.
-
-  Spreading factor affects how far apart the radio's transmissions
-  are, across the available bandwidth. Radios with different spreading
-  factors will not receive each other's transmissions. This is one way you
-  can filter out radios you want to ignore, without making an addressing scheme.
-
-  Spreading factor affects reliability of transmission at high rates, however,
-  so avoid a hugh spreading factor when you're sending continually.
-
-  See the Semtech datasheet, http://www.semtech.com/images/datasheet/sx1276.pdf
-  for more on Spreading Factor.
-
-  created 28 April 2017
-  by Tom Igoe
-*/
 #include <Wire.h>
 #include <Adafruit_Sensor.h>
 #include <Adafruit_BME280.h>
